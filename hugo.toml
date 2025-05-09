@@ -1,8 +1,15 @@
 baseURL = 'http://www.nunoalves.com/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
-theme = 'ananke'
+title = 'ohNoNuNo'
+pagination.pagerSize = "10" # Number of posts per page
+theme = "mainroad" #https://github.com/Vimux/Mainroad/
+
+[Params.logo]
+  image = "img/floating_city-John_Harris.jpg" # Logo image. Path relative to "static"
+  #title = "" #Logo title, otherwise will use site title
+  #subtitle = "" #Logo subtitle
 
 [caches]
   [caches.images]
     dir = ':cacheDir/images'
+
