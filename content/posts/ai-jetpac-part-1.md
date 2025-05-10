@@ -1,6 +1,6 @@
 +++
 date = '2025-05-09T21:51:55-04:00'
-draft = true
+draft = false
 title = 'AI Jetpac, Part 1'
 +++
 
