@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AI Jetpac, Part 1 - ohNoNuNo</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+
+	<link rel="stylesheet" href="/css/style.css">
+	
+
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container header__container">
+		
+	<div class="logo logo--mixed">
+		<a class="logo__link" href="/" title="ohNoNuNo" rel="home">
+			<div class="logo__item logo__imagebox">
+					<img class="logo__img" src="/img/floating_city-John_Harris.jpg">
+				</div><div class="logo__item logo__text">
+					<div class="logo__title">ohNoNuNo</div>
+					
+				</div>
+		</a>
+	</div>
+		<div class="divider"></div>
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">AI Jetpac, Part 1</h1>
+			
+		</header>
+		<div class="content post__content clearfix">
+			<p>So the other day I found myself firing up an emulator to play some of the ’80s <a href="https://en.wikipedia.org/wiki/ZX_Spectrum">ZX Spectrum</a> games that were a staple of my childhood. I ran through the classics—<strong><a href="https://en.wikipedia.org/wiki/Manic_Miner">Manic Miner</a></strong>, <strong><a href="https://en.wikipedia.org/wiki/Skool_Daze">Skool Daze</a></strong>, <strong><a href="https://worldofspectrum.net/item/0004010/">Rambo</a></strong>, <strong><a href="https://worldofspectrum.net/item/0000718/">Bruce Lee</a></strong>—but there’s always one that stands out: <strong><a href="https://en.wikipedia.org/wiki/Jetpac">Jetpac</a></strong>.  Masterpiece. You’re an 80&rsquo;s astronaut, lazering aliens while scavenging fuel that falls from the sky, using it to refill your ship so it can take you to a another planet that looks the same&hellip; Where did that fuel come from? Why does Jetman teleport to the opposite edge when he hits the screen border? Mysteries yet unsolved. At age five, I was rubbish at Jetpac; decades later I still am. Unable to reach level 4, I am bested by a game that fits in 48 KB of RAM.</p>
+<blockquote>
+<p><strong>If only there were a way to play better&hellip;</strong></p></blockquote>
+<p>The next day—during my lunch break—I stumbled once again on Petter Ögren’s <a href="https://www.youtube.com/watch?v=KeShMInMjro&amp;list=PLFQdM4LOGDr_vYJuo8YTRcmv3FrwczdKg">behavior-tree introduction videos</a>. In a nutshell, a behavior tree is just a way to decide what to do next. Let’s say you have a little video-game character (an agent), and there are many &ldquo;simple&rdquo; actions they can perform at any moment (e.g. move left, jump, dodge, shoot, etc.). By deciding which action to perform next, you can give that character surprisingly complex and intelligent behavior—run then dodge when barely close to an enemy, and shoot sideways while moving backwards and facing down. The neat thing about behavior trees is that the next action depends on the entire state of the world, not on the task currently being performed (as with finite-state machines). Super neat. Seemed like a good idea to give Jetman some intelligence and let him play himself. Hobby project&hellip; Not sure when I’ll be done—it may take a while—but there’s no better place to begin than at the beginning.</p>
+<hr>
+<h2 id="first-steps">First Steps</h2>
+<ol>
+<li>
+<p><strong>Hook into ZEsarUX’s remote protocol</strong><br>
+To give Jetman some AI, I need to control it programmatically (press movement buttons) and read the game state (e.g. where Jetman and the enemies are). The easiest way is to run Jetpac under ZEsarUX 12.0 with <code>--enable-remoteprotocol</code>. That opens a TCP socket so you can issue text commands (via telnet) directly to the emulator—things like <code>read-memory</code> and <code>send-keys-event</code> to inspect memory and press keys.</p>
+</li>
+<li>
+<p><strong>Reverse-engineer the game state</strong><br>
+From <a href="https://phillipeaton.github.io/jetpac-disassembly/">Phillipe Eaton’s disassembly</a>, I extracted the RAM addresses that store:</p>
+<ul>
+<li>Jetman’s X/Y position, speed, lives, and level</li>
+<li>Six alien slots’ X/Y coordinates and speeds</li>
+</ul>
+</li>
+<li>
+<p><strong>Python code</strong><br>
+Python makes it quick and dirty to wire this up. My script opens the socket, sends the keys to start the game, polls the game state every 200 ms, and passes that info into my AI controller.</p>
+</li>
+<li>
+<p><strong>Janky AI controller</strong><br>
+My initial AI is as janky as it gets. If the closest alien is within 40 pixels, fire the laser (direction doesn’t matter). Otherwise, always move away from enemies—ignoring platforms, wrap-around edges, fuel pickups, and basically everything else.</p>
+<figure><img src="/img/jetpac_ai_20250509.png"
+   	    alt="AI controller on level 1"><figcaption>
+   	      <p>AI controller on level 1</p>
+   	    </figcaption>
+   	</figure>
+
+</li>
+</ol>
+<hr>
+<h2 id="getting-it-to-work">Getting It to Work</h2>
+<p>Check out <a href="https://github.com/nunoalves/ai-jetpac/tree/043e3c445ca882f0d96c01f23e84f63f522904f9">this repo</a> for the complete code.</p>
+<ol>
+<li>
+<p>Edit the <code>runme.sh</code> or <code>runme.bat</code> script to point to your ZEsarUX emulator and the <code>Jetpac.tzx</code> file.</p>
+</li>
+<li>
+<p>Run the shell or batch script.</p>
+</li>
+<li>
+<p>In a parallel window, run:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python main.py
+</span></span></code></pre></div></li>
+</ol>
+<p>In <code>main.py</code>, you can toggle specific modes by setting these flags:</p>
+<ul>
+<li><code>ENABLE_WATCH</code> — prints Jetman’s and all aliens’ positions and speeds.</li>
+<li><code>ENABLE_AI_CONTROL</code> — enables the janky AI controller.</li>
+<li><code>ENABLE_GAME_OVER_EXIT</code> — exits the script when the game is over.</li>
+</ul>
+<p>With ZEsarUX’s remote protocol, only two commands are needed:</p>
+<ul>
+<li><strong><code>read-memory &lt;addr&gt; 1</code></strong> — read a single byte from RAM.</li>
+<li><strong><code>send-keys-event &lt;code&gt; &lt;0|1&gt;</code></strong> — press or release a Spectrum key.</li>
+</ul>
+<p>All the RAM addresses and key codes live in <a href="https://github.com/nunoalves/ai-jetpac/blob/043e3c445ca882f0d96c01f23e84f63f522904f9/jetpac_game_state.py">jetpac_game_state.py</a>.</p>
+
+		</div>
+	</article>
+</main>
+
+
+
+
+			</div>
+			
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2025 ohNoNuNo.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>
