@@ -2,10 +2,32 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on ohNoNuNo</title>
-    <link>http://www.nunoalves.com/tags/</link>
+    <link>http://localhost:1313/tags/</link>
     <description>Recent content in Tags on ohNoNuNo</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <atom:link href="http://www.nunoalves.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 May 2025 21:51:55 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AI</title>
+      <link>http://localhost:1313/tags/ai/</link>
+      <pubDate>Fri, 09 May 2025 21:51:55 -0400</pubDate>
+      <guid>http://localhost:1313/tags/ai/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Retro Gaming</title>
+      <link>http://localhost:1313/tags/retro-gaming/</link>
+      <pubDate>Fri, 09 May 2025 21:51:55 -0400</pubDate>
+      <guid>http://localhost:1313/tags/retro-gaming/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ZX Spectrum</title>
+      <link>http://localhost:1313/tags/zx-spectrum/</link>
+      <pubDate>Fri, 09 May 2025 21:51:55 -0400</pubDate>
+      <guid>http://localhost:1313/tags/zx-spectrum/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

@@ -13,3 +13,6 @@ theme = "mainroad" #https://github.com/Vimux/Mainroad/
   [caches.images]
     dir = ':cacheDir/images'
 
+[taxonomies]
+  tag = "tags"
+  category = "categories"
