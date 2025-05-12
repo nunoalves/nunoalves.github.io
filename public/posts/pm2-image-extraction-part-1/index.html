@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Extracting Assets From Premier Manager 2 - ohNoNuNo</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		
+  <meta itemprop="name" content="Extracting Assets From Premier Manager 2">
+  <meta itemprop="description" content="About once every five years I fire up Premier Manager 2 — THE soccer management game before Championship Manager monopolised the genre. (These days, you can even play PM2 in your browser.)
+Before starting to play, this time I noticed an interesting mix of files in the root directory — thingslike contract.gnd, icons.vga, anim.bin, goal.voc, and others—and wondered how hard it would be to decode them with modern tooling. Surely the .gnd and .vga files were graphic assets, the .voc files audio, and so on. A little reverse‑engineering later, here’s what I found about the image formats…">
+  <meta itemprop="datePublished" content="2024-04-20T14:30:00-04:00">
+  <meta itemprop="dateModified" content="2024-04-20T14:30:00-04:00">
+  <meta itemprop="wordCount" content="570">
+  <meta itemprop="keywords" content="DOS,Retro Gaming">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+
+	<link rel="stylesheet" href="/css/style.css">
+	
+
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container header__container">
+		
+	<div class="logo logo--mixed">
+		<a class="logo__link" href="/" title="ohNoNuNo" rel="home">
+			<div class="logo__item logo__imagebox">
+					<img class="logo__img" src="/img/floating_city-John_Harris.jpg">
+				</div><div class="logo__item logo__text">
+					<div class="logo__title">ohNoNuNo</div>
+					
+				</div>
+		</a>
+	</div>
+		<div class="divider"></div>
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Extracting Assets From Premier Manager 2</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 1 1 0 28 1 1 0 0 1 0-28m0 3a3 3 0 1 0 0 22 3 3 0 0 0 0-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class="meta__text" datetime="2024-04-20T14:30:00-04:00">April 20, 2024</time></div></div>
+		</header>
+		
+	<figure class="post__thumbnail thumbnail">
+		
+		<img class="thumbnail__image" src="/img/20240420-pm2_assets/thumb.bmp" alt="Extracting Assets From Premier Manager 2">
+		
+	</figure>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-pm2-vga-format">The PM2 <code>.vga</code> Format</a>
+      <ul>
+        <li><a href="#file-layout">File layout</a></li>
+      </ul>
+    </li>
+    <li><a href="#tool-1---batch-image-extractor">Tool 1 - Batch Image Extractor</a></li>
+    <li><a href="#tool-2---dynamic-font-display">Tool 2 - Dynamic Font Display</a></li>
+    <li><a href="#next-steps-">Next Steps &hellip;</a></li>
+  </ul>
+</nav>
+	</div>
+</div><div class="content post__content clearfix">
+			<p>About once every five years I fire up <em><a href="https://en.wikipedia.org/wiki/Premier_Manager_2">Premier Manager 2</a></em> — THE soccer management game before <em><a href="https://en.wikipedia.org/wiki/Championship_Manager_93/94">Championship Manager</a></em> monopolised the genre. (These days, you can even play <a href="https://archive.org/details/msdos_Premier_Manager_2_1993">PM2 in your browser</a>.)</p>
+<p>Before starting to play, this time I noticed an interesting mix of files in the root directory — thingslike <code>contract.gnd</code>, <code>icons.vga</code>, <code>anim.bin</code>, <code>goal.voc</code>, and others—and wondered how hard it would be to decode them with modern tooling. Surely the <code>.gnd</code> and <code>.vga</code> files were graphic assets, the <code>.voc</code> files audio, and so on. A little reverse‑engineering later, here’s what I found about the image formats&hellip;</p>
+<hr>
+<h2 id="the-pm2-vga-format">The PM2 <code>.vga</code> Format</h2>
+<p>Every PM2 graphic needs two files:</p>
+<ol>
+<li><strong>Image file</strong> (e.g. <code>icons.vga</code>, <code>font16c.vga</code>) – stores pixel indices.</li>
+<li><strong>Palette file</strong> (<code>paldata.vga</code> for in‑game screens, <code>paltitle.vga</code> for the title screen) – stores the actual colours.</li>
+</ol>
+<p>The PM2 palette is just a basic look‑up table: 256 entries x 3 bytes (red, green, blue) = 768 bytes that follow a 0x100‑byte header. Each pixel in the image is an index (0‑255) into that palette table, keeping files tiny and guaranteeing that every sprite, font, and icon shares the exact same colour set.</p>
+<p>Why only 256 colours? Classic DOS VGA modes (320 × 200, 8‑bit), such as this masterpiece, were limited to a 256‑entry palette. SVGA later raised the bar on resolution and, eventually, colour depth, but PM2 shipped pretty much as SVGA was getting started.</p>
+<h3 id="file-layout">File layout</h3>
+<pre tabindex="0"><code>0x000–0x0FF   File header (256 bytes)
+0x100–0x3FF   Palette data (only in palette files: 256 × RGB)
+0x400–EOF     Image blocks
+</code></pre><p>Each <em>image block</em> starts with an 8‑byte header:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: right">Offset</th>
+          <th style="text-align: right">Size (Bytes)</th>
+          <th>Purpose</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: right">0</td>
+          <td style="text-align: right">4</td>
+          <td>unused / reserved</td>
+      </tr>
+      <tr>
+          <td style="text-align: right">4</td>
+          <td style="text-align: right">2</td>
+          <td>height (<code>y_size</code>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: right">6</td>
+          <td style="text-align: right">2</td>
+          <td>width (<code>x_size</code>)</td>
+      </tr>
+  </tbody>
+</table>
+<p>Pixel data immediately follows and is exactly <code>width x height</code> bytes. Because of that regularity, you can iterate through a file like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>block_size <span style="color:#f92672">=</span> x_size <span style="color:#f92672">*</span> y_size <span style="color:#f92672">+</span> <span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>num_images <span style="color:#f92672">=</span> len(raw_data) <span style="color:#f92672">//</span> block_size
+</span></span></code></pre></div><hr>
+<h2 id="tool-1---batch-image-extractor">Tool 1 - Batch Image Extractor</h2>
+<ul>
+<li><strong><a href="https://github.com/nunoalves/PM2_Legacy/blob/c0e808c4ee9800a2d2864b18bfc1e6254aa5d42f/tools/verifyAssets.py#L1">verifyAssets.py</a></strong></li>
+<li><strong><a href="https://github.com/nunoalves/PM2_Legacy/blob/c0e808c4ee9800a2d2864b18bfc1e6254aa5d42f/tools/vgaToBmp.py#L1">vgaToBmp.py</a></strong></li>
+</ul>
+<p>I wrote two small Python scripts that validate all assets, walk through a <code>.vga</code> file, pulls out each bitmap, and saves it as a BMP. Grab the PM2 game files (the easiest source is <a href="https://www.myabandonware.com/game/premier-manager-2-1zx#download">My Abandonware</a>), drop them in an <code>assets/</code> folder, then run:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 verifyAssets.py     <span style="color:#75715e"># validates file hashes</span>
+</span></span><span style="display:flex;"><span>python3 vgaToBmp.py         <span style="color:#75715e"># dumps every icon/font/sprite to BMP</span>
+</span></span></code></pre></div><blockquote>
+<p><strong>&hellip;But I don&rsquo;t want to run your janky script.</strong></p></blockquote>
+<p>Fine&hellip; Here are the extracted assets images:</p>
+<figure><img src="/img/20240420-pm2_assets/fax_merged.bmp"><figcaption>
+      <h4>Fax screen (fax_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font16c_merged.bmp"><figcaption>
+      <h4>Font16c glyphs (font16c_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font55_merged.bmp"><figcaption>
+      <h4>Font55 glyphs (font55_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font57_merged.bmp"><figcaption>
+      <h4>Font57 glyphs (font57_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font57b_merged.bmp"><figcaption>
+      <h4>Font57b glyphs (font57b_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font77_merged.bmp"><figcaption>
+      <h4>Font77 glyphs (font77_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font77b_merged.bmp"><figcaption>
+      <h4>Font77b glyphs (font77b_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/font77c_merged.bmp"><figcaption>
+      <h4>Font77c glyphs (font77c_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/fontf9_merged.bmp"><figcaption>
+      <h4>FontF9 glyphs (fontf9_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/gndscore_merged.bmp"><figcaption>
+      <h4>Score background (gndscore_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/gndseats_merged.bmp"><figcaption>
+      <h4>Stadium seats (gndseats_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/groundix_merged.bmp"><figcaption>
+      <h4>Ground index (groundix_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/icons_merged.bmp"><figcaption>
+      <h4>UI icons (icons_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/impslbar_merged.bmp"><figcaption>
+      <h4>Impulse bar (impslbar_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/matball_merged.bmp"><figcaption>
+      <h4>Match ball icon (matball_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/matbtn_merged.bmp"><figcaption>
+      <h4>Match buttons (matbtn_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/matspd_merged.bmp"><figcaption>
+      <h4>Match speed bar (matspd_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/phone2_merged.bmp"><figcaption>
+      <h4>Phone UI 1 (phone2_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/phonem_merged.bmp"><figcaption>
+      <h4>Phone UI 2 (phonem_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/pitch_merged.bmp"><figcaption>
+      <h4>Pitch sprites (pitch_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/pitchbit_merged.bmp"><figcaption>
+      <h4>Pitch bitmap (pitchbit_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/posgraph_merged.bmp"><figcaption>
+      <h4>Position graph (posgraph_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/report_merged.bmp"><figcaption>
+      <h4>Report screen (report_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/result_merged.bmp"><figcaption>
+      <h4>Result screen (result_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/sec2_merged.bmp"><figcaption>
+      <h4>Security screen 2 (sec2_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/sh_merged.bmp"><figcaption>
+      <h4>Shareholders screen (sh_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/sponsors_merged.bmp"><figcaption>
+      <h4>Sponsors screen (sponsors_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/ticket_merged.bmp"><figcaption>
+      <h4>Ticket window (ticket_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20240420-pm2_assets/validbtn_merged.bmp"><figcaption>
+      <h4>Validation buttons (validbtn_merged.vga)</h4>
+    </figcaption>
+</figure>
+
+<hr>
+<h2 id="tool-2---dynamic-font-display">Tool 2 - Dynamic Font Display</h2>
+<ul>
+<li><strong><a href="https://github.com/nunoalves/PM2_Legacy/blob/c0e808c4ee9800a2d2864b18bfc1e6254aa5d42f/tools/dynamicFontDisplay.py#L1">dynamicFontDisplay.py</a></strong></li>
+</ul>
+<p>With the fonts extracted, why not type in glorious mid‑90 s style?
+<code>dynamicFontDisplay.py</code> is a quick Pygame demo that does exactly that:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 dynamicFontDisplay.py assets/font16c.vga assets/paldata.vga --scale <span style="color:#ae81ff">4</span>
+</span></span></code></pre></div><p>Where <code>--scale</code> enlarges each glyph by an integer factor. Here’s a sample output:</p>
+<p><img src="/img/20240420-pm2_assets/dynamicText.png" alt="Dynamic font demo"></p>
+<hr>
+<h2 id="next-steps-">Next Steps &hellip;</h2>
+<p>The image background <code>.gnd</code> files are tougher: they appear to be compressed with a custom Lempel‑Ziv–Huffman variant. I’m pretty sure I’ll have to dive into the main executable to see how its compressed. Next time.</p>
+
+		</div>
+		<footer class="post__footer">
+			
+<div class="post__tags tags clearfix">
+	<svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M4 0h8s2 0 4 2l15 15s2 2 0 4L21 31s-2 2-4 0L2 16s-2-2-2-4V3s0-3 4-3m3 10a3 3 0 0 0 0-6 3 3 0 0 0 0 6"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/dos/" rel="tag">DOS</a>
+		</li>
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/retro-gaming/" rel="tag">Retro Gaming</a>
+		</li>
+	</ul>
+</div>
+		</footer>
+	</article>
+</main>
+
+
+
+
+			</div>
+			
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2025 ohNoNuNo.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

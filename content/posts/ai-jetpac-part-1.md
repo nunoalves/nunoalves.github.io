@@ -3,7 +3,7 @@ date = '2025-05-09T21:51:55-04:00'
 draft = false
 title = 'AI Jetpac, Part 1'
 tags = ["ZX Spectrum","Retro Gaming","AI"]
-thumbnail = "img/jetpac_ai_20250509-thumb.jpg"
+thumbnail = "img/20250509-jetpac_ai/thumb.jpg"
 +++
 
 So the other day I found myself firing up an emulator to play some of the ’80s [ZX Spectrum](https://en.wikipedia.org/wiki/ZX_Spectrum) games that were a staple of my childhood. I ran through the classics—**[Manic Miner](https://en.wikipedia.org/wiki/Manic_Miner)**, **[Skool Daze](https://en.wikipedia.org/wiki/Skool_Daze)**, **[Rambo](https://worldofspectrum.net/item/0004010/)**, **[Bruce Lee](https://worldofspectrum.net/item/0000718/)**—but there’s always one that stands out: **[Jetpac](https://en.wikipedia.org/wiki/Jetpac)**.  Masterpiece. You’re an 80's astronaut, lazering aliens while scavenging fuel that falls from the sky, using it to refill your ship so it can take you to a another planet that looks the same... Where did that fuel come from? Why does Jetman teleport to the opposite edge when he hits the screen border? Mysteries yet unsolved. At age five, I was rubbish at Jetpac; decades later I still am. Unable to reach level 4, I am bested by a game that fits in 48 KB of RAM.
@@ -31,7 +31,7 @@ The next day—during my lunch break—I stumbled once again on Petter Ögren’
    My initial AI is as janky as it gets. If the closest alien is within 40 pixels, fire the laser (direction doesn’t matter). Otherwise, always move away from enemies—ignoring platforms, wrap-around edges, fuel pickups, and basically everything else.
 
    	{{< figure 
-       	src="/img/jetpac_ai_20250509.png" 
+       	src="/img/20250509-jetpac_ai/jetpac_ai_20250509.png" 
        	caption="AI controller on level 1" 
 	>}}
 

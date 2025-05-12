@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pygame on ohNoNuNo</title>
+    <link>http://localhost:1313/tags/pygame/</link>
+    <description>Recent content in Pygame on ohNoNuNo</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 20 Apr 2024 14:30:00 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/pygame/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Working with Premier Manager 2 VGA Assets: Image Extraction &amp; Dynamic Fonts</title>
+      <link>http://localhost:1313/posts/pm2-image-extraction-part-1/</link>
+      <pubDate>Sat, 20 Apr 2024 14:30:00 -0400</pubDate>
+      <guid>http://localhost:1313/posts/pm2-image-extraction-part-1/</guid>
+      <description>&lt;p&gt;If you’ve explored the Premier Manager 2 data files, you’ve probably come across two handy Python utilities:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&lt;strong&gt;VGA Image Extractor&lt;/strong&gt; – dumps every bitmap (icons, UI elements, sprites) to standalone PNGs.&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Dynamic Font Display&lt;/strong&gt; – renders text in real time using the game’s built-in font glyphs.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;In this post we’ll cover:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;The structure of &lt;code&gt;.vga&lt;/code&gt; container files&lt;/li&gt;&#xA;&lt;li&gt;How the &lt;strong&gt;Image Extractor&lt;/strong&gt; works&lt;/li&gt;&#xA;&lt;li&gt;How the &lt;strong&gt;Font Display&lt;/strong&gt; tool works&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;the-pm2-vga-format&#34;&gt;The PM2 &lt;code&gt;.vga&lt;/code&gt; Format&lt;/h2&gt;&#xA;&lt;p&gt;PM2’s &lt;code&gt;.vga&lt;/code&gt; files are custom containers holding multiple fixed-size bitmaps and (in the palette files) the 256-color palette. The layout looks like this:&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

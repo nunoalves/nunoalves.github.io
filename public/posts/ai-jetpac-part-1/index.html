@@ -6,6 +6,13 @@
 	<title>AI Jetpac, Part 1 - ohNoNuNo</title>
 	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
 	<meta name="description" content="">
+		
+  <meta itemprop="name" content="AI Jetpac, Part 1">
+  <meta itemprop="description" content="So the other day I found myself firing up an emulator to play some of the ’80s ZX Spectrum games that were a staple of my childhood. I ran through the classics—Manic Miner, Skool Daze, Rambo, Bruce Lee—but there’s always one that stands out: Jetpac. Masterpiece. You’re an 80’s astronaut, lazering aliens while scavenging fuel that falls from the sky, using it to refill your ship so it can take you to a another planet that looks the same… Where did that fuel come from? Why does Jetman teleport to the opposite edge when he hits the screen border? Mysteries yet unsolved. At age five, I was rubbish at Jetpac; decades later I still am. Unable to reach level 4, I am bested by a game that fits in 48 KB of RAM.">
+  <meta itemprop="datePublished" content="2025-05-09T21:51:55-04:00">
+  <meta itemprop="dateModified" content="2025-05-09T21:51:55-04:00">
+  <meta itemprop="wordCount" content="609">
+  <meta itemprop="keywords" content="ZX Spectrum,Retro Gaming,AI">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
 	<link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -42,14 +49,27 @@
 	<article class="post">
 		<header class="post__header">
 			<h1 class="post__title">AI Jetpac, Part 1</h1>
-			
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 1 1 0 28 1 1 0 0 1 0-28m0 3a3 3 0 1 0 0 22 3 3 0 0 0 0-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class="meta__text" datetime="2025-05-09T21:51:55-04:00">May 9, 2025</time></div></div>
 		</header>
 		
 	<figure class="post__thumbnail thumbnail">
 		
-		<img class="thumbnail__image" src="/img/jetpac_ai_20250509-thumb.jpg" alt="AI Jetpac, Part 1">
+		<img class="thumbnail__image" src="/img/20250509-jetpac_ai/thumb.jpg" alt="AI Jetpac, Part 1">
 		
-	</figure><div class="content post__content clearfix">
+	</figure>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+  <ul>
+    <li><a href="#first-steps">First Steps</a></li>
+    <li><a href="#getting-it-to-work">Getting It to Work</a></li>
+  </ul>
+</nav>
+	</div>
+</div><div class="content post__content clearfix">
 			<p>So the other day I found myself firing up an emulator to play some of the ’80s <a href="https://en.wikipedia.org/wiki/ZX_Spectrum">ZX Spectrum</a> games that were a staple of my childhood. I ran through the classics—<strong><a href="https://en.wikipedia.org/wiki/Manic_Miner">Manic Miner</a></strong>, <strong><a href="https://en.wikipedia.org/wiki/Skool_Daze">Skool Daze</a></strong>, <strong><a href="https://worldofspectrum.net/item/0004010/">Rambo</a></strong>, <strong><a href="https://worldofspectrum.net/item/0000718/">Bruce Lee</a></strong>—but there’s always one that stands out: <strong><a href="https://en.wikipedia.org/wiki/Jetpac">Jetpac</a></strong>.  Masterpiece. You’re an 80&rsquo;s astronaut, lazering aliens while scavenging fuel that falls from the sky, using it to refill your ship so it can take you to a another planet that looks the same&hellip; Where did that fuel come from? Why does Jetman teleport to the opposite edge when he hits the screen border? Mysteries yet unsolved. At age five, I was rubbish at Jetpac; decades later I still am. Unable to reach level 4, I am bested by a game that fits in 48 KB of RAM.</p>
 <blockquote>
 <p><strong>If only there were a way to play better&hellip;</strong></p></blockquote>
@@ -76,7 +96,7 @@ Python makes it quick and dirty to wire this up. My script opens the socket, sen
 <li>
 <p><strong>Janky AI controller</strong><br>
 My initial AI is as janky as it gets. If the closest alien is within 40 pixels, fire the laser (direction doesn’t matter). Otherwise, always move away from enemies—ignoring platforms, wrap-around edges, fuel pickups, and basically everything else.</p>
-<figure><img src="/img/jetpac_ai_20250509.png"
+<figure><img src="/img/20250509-jetpac_ai/jetpac_ai_20250509.png"
    	    alt="AI controller on level 1"><figcaption>
    	      <p>AI controller on level 1</p>
    	    </figcaption>

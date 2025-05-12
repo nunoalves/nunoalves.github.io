@@ -29,5 +29,12 @@
       <guid>http://localhost:1313/tags/zx-spectrum/</guid>
       <description></description>
     </item>
+    <item>
+      <title>DOS</title>
+      <link>http://localhost:1313/tags/dos/</link>
+      <pubDate>Sat, 20 Apr 2024 14:30:00 -0400</pubDate>
+      <guid>http://localhost:1313/tags/dos/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>

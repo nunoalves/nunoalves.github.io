@@ -1,10 +1,10 @@
 baseURL = 'http://www.nunoalves.com/'
 languageCode = 'en-us'
 title = 'ohNoNuNo'
-pagination.pagerSize = "10" # Number of posts per page
+pagination.pagerSize = 10 # Number of posts per page
 theme = "mainroad" #https://github.com/Vimux/Mainroad/
 
-[Params.logo]
+[params.logo]
   image = "img/floating_city-John_Harris.jpg" # Logo image. Path relative to "static"
   #title = "" #Logo title, otherwise will use site title
   #subtitle = "" #Logo subtitle
@@ -16,3 +16,26 @@ theme = "mainroad" #https://github.com/Vimux/Mainroad/
 [taxonomies]
   tag = "tags"
   category = "categories"
+
+[params.widgets.social]
+  cached = false # activate cache if true
+  # Enable parts of social widget
+  github  = "nunoalves"
+  twitter = "nunoalves"
+
+[params]
+  dateformat = "January 2, 2006"
+  post_meta = ["author", "date", "categories", "translations"]
+  toc = true # Enable Table of Contents
+  mainSections = ["posts"] # Specify section pages to show on home page and the "Recent articles" widget
+  schema = true # Enable Schema
+
+#[params.thumbnail]
+#  visibility = ["list", "post"] # Control thumbnail visibility
+
+[params.sidebar]
+  home = "right" # Configure layout for home page
+  list = "right"  # Configure layout for list pages
+  single = false # Configure layout for single pages
+  # Enable widgets in given order
+  widgets = ["search", "recent", "categories", "taglist", "social"]

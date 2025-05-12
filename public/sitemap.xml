@@ -23,6 +23,12 @@
     <loc>http://localhost:1313/tags/zx-spectrum/</loc>
     <lastmod>2025-05-09T21:51:55-04:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/tags/dos/</loc>
+    <lastmod>2024-04-20T14:30:00-04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/pm2-image-extraction-part-1/</loc>
+    <lastmod>2024-04-20T14:30:00-04:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/categories/</loc>
   </url>
 </urlset>
