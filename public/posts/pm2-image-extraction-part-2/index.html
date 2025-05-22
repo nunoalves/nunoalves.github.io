@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Reverse Engineering Backgrounds From Premier Manager 2 - ohNoNuNo</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		
+  <meta itemprop="name" content="Reverse Engineering Backgrounds From Premier Manager 2">
+  <meta itemprop="description" content="So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (.gnd) files. A year or so ago, I worked on the .vga files, so now it’s time to try decoding the .gnd files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!">
+  <meta itemprop="datePublished" content="2025-05-21T23:02:19-04:00">
+  <meta itemprop="dateModified" content="2025-05-21T23:02:19-04:00">
+  <meta itemprop="wordCount" content="2201">
+  <meta itemprop="keywords" content="DOS,Retro Gaming,Reverse Engineering">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+
+	<link rel="stylesheet" href="/css/style.css">
+	
+
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container header__container">
+		
+	<div class="logo logo--mixed">
+		<a class="logo__link" href="/" title="ohNoNuNo" rel="home">
+			<div class="logo__item logo__imagebox">
+					<img class="logo__img" src="/img/floating_city-John_Harris.jpg">
+				</div><div class="logo__item logo__text">
+					<div class="logo__title">ohNoNuNo</div>
+					
+				</div>
+		</a>
+	</div>
+		<div class="divider"></div>
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Reverse Engineering Backgrounds From Premier Manager 2</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 1 1 0 28 1 1 0 0 1 0-28m0 3a3 3 0 1 0 0 22 3 3 0 0 0 0-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class="meta__text" datetime="2025-05-21T23:02:19-04:00">May 21, 2025</time></div></div>
+		</header>
+		
+	<figure class="post__thumbnail thumbnail">
+		
+		<img class="thumbnail__image" src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp" alt="Reverse Engineering Backgrounds From Premier Manager 2">
+		
+	</figure>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+  <ul>
+    <li><a href="#first-steps">First Steps</a></li>
+    <li><a href="#entropy-analysis">Entropy Analysis</a></li>
+    <li><a href="#displaying-palette-data">Displaying Palette Data</a></li>
+    <li><a href="#first-steps-1">First Steps</a></li>
+    <li><a href="#decoding-the-gnd-files">Decoding the <code>.gnd</code> Files</a>
+      <ul>
+        <li><a href="#literal--repeat-samples">Literal &amp; Repeat Samples</a></li>
+        <li><a href="#small-copy-sequences">Small “Copy” Sequences</a></li>
+        <li><a href="#long-repeat--copy-mix">Long Repeat &amp; Copy Mix</a></li>
+        <li><a href="#experimenting-with-fill-opcodes">Experimenting With “Fill” Opcodes</a></li>
+        <li><a href="#complete-gnd-opcode-reference">Complete <strong><code>.gnd</code></strong> Opcode Reference</a></li>
+      </ul>
+    </li>
+    <li><a href="#the-decoder-script">The Decoder Script</a></li>
+    <li><a href="#decoded-images">Decoded Images</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+  </ul>
+</nav>
+	</div>
+</div><div class="content post__content clearfix">
+			<p>So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (<code>.gnd</code>) files. A year or so ago, I worked on the <code>.vga</code> files, so now it’s time to try decoding the <code>.gnd</code> files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!</p>
+<p>Judging by the filenames, the <code>.gnd</code> files are background images. The easiest way to begin is to find a way to reliably display a specific image in the game, inspect the file for patterns, and then modify it byte by byte to see the effects.</p>
+<p>I’m doing this on my Mac, but you can use whatever OS you prefer. I’m using <a href="https://dosbox-x.com">DosBox-X</a> as my DOS emulator.</p>
+<h2 id="first-steps">First Steps</h2>
+<p>First, here are all the <code>.gnd</code> files sorted by size so I can choose the smallest one to start with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls -lSh *.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    34K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> credits.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    30K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> seas2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    26K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> seas1.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    24K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> titlepic.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    20K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> seas3.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    18K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> mainoff2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    18K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> validpi2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    17K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> result.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    16K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> diskpic2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    12K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> sec2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    12K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> sponsor1.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff    12K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> sound.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   9.9K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> report.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   9.6K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> options2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   9.3K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> contract.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   6.5K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> gndpane2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   6.0K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> gndside2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   6.0K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> gndgoal2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   5.4K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> padpic2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   4.6K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> tactic.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   4.2K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> matchpic.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   2.7K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> namespic.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   2.4K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> anim.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   1.9K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> monitor.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   1.6K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> gndcove2.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   1.3K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> fax.gnd
+</span></span><span style="display:flex;"><span>-rw-r--r--@ <span style="color:#ae81ff">1</span> nunoalves  staff   1.3K Dec <span style="color:#ae81ff">24</span>  <span style="color:#ae81ff">1996</span> sponsor2.gnd
+</span></span></code></pre></div><p>So, <code>sponsor2.gnd</code> is the smallest, so it should be the easiest to understand and decode. To find out where it appears in-game, back it up and replace its contents with another file (for example, <code>sec2.gnd</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mv sponsor2.gnd sponsor2.bak
+</span></span><span style="display:flex;"><span>cp sec2.gnd sponsor2.gnd
+</span></span></code></pre></div><p>Weirdly, PM2 crashes whenever the sponsors window is clicked—suggesting a format mismatch. That crash was a godsend, because now I know <code>sponsor2.gnd</code> is rendered behind the sponsors icon on the main screen:
+<figure><img src="/img/20250521-pm2_gnd/sec2.png"><figcaption>
+      <h4>Copying sec2.gnd to sponsor2.gnd crashes PM2</h4>
+    </figcaption>
+</figure>
+</p>
+<p>As a baseline, I restore the original <code>sponsor2.gnd</code> and check how the sponsors menu looks:
+<figure><img src="/img/20250521-pm2_gnd/sponsors2.png"><figcaption>
+      <h4>Original sponsor2.gnd in-game</h4>
+    </figcaption>
+</figure>
+</p>
+<p>It turns out <code>sponsor2.gnd</code> is the cloud background. Next, let’s replace it with another file—say <code>diskpic2.gnd</code>:
+<figure><img src="/img/20250521-pm2_gnd/diskpic2.png"><figcaption>
+      <h4>diskpic2.gnd used as sponsor2.gnd; background changed successfully</h4>
+    </figcaption>
+</figure>
+</p>
+<p>It seems some background files crash PM2 when copied into <code>sponsor2.gnd</code>. Let’s see which ones crash the game and which don’t:</p>
+<ul>
+<li>
+<p><strong>Crashes</strong>:
+<code>credits.gnd</code>, <code>seas2.gnd</code>, <code>seas1.gnd</code>, <code>titlepic.gnd</code>, <code>seas3.gnd</code>, <code>validpi2.gnd</code>, <code>sec2.gnd</code>, <code>sponsor1.gnd</code>, <code>sound.gnd</code>, <code>report.gnd</code>, <code>options2.gnd</code>, <code>contract.gnd</code>, <code>gndpane2.gnd</code>, <code>gndside2.gnd</code>, <code>gndgoal2.gnd</code>, <code>tactic.gnd</code>, <code>namespic.gnd</code></p>
+</li>
+<li>
+<p><strong>OK</strong>:
+<code>mainoff2.gnd</code>, <code>result.gnd</code>, <code>diskpic2.gnd</code>, <code>phonpic2.gnd</code>, <code>padpic2.gnd</code>, <code>matchpic.gnd</code>, <code>anim.gnd</code>, <code>monitor.gnd</code>, <code>gndcove2.gnd</code>, <code>fax.gnd</code></p>
+</li>
+</ul>
+<p>It looks like certain <code>.gnd</code> files are decoded differently—dubious! In any case, since <code>sec2.gnd</code> appears in the secretary window, let’s apply the same trick and see if the rest of the files can be decoded when their contents are copied into <code>sec2.gnd</code>.</p>
+<ul>
+<li><strong>OK</strong>:
+<code>seas2.gnd</code>, <code>seas1.gnd</code>, <code>seas3.gnd</code>, <code>validpi2.gnd</code>, <code>sponsor1.gnd </code>, <code>sound.gnd</code>, <code>report.gnd</code>, <code>options2.gnd</code>, <code>gndpane2.gnd</code>, <code>gndside2.gnd</code>, <code>gndgoal2.gnd</code>, <code>tactic.gnd</code>, <code>namespic.gnd</code></li>
+<li><strong>OK (&hellip;But Odd Colors)</strong>:
+<code>credits.gnd</code>, <code>titlepic.gnd</code>, <code>contract.gnd</code></li>
+</ul>
+<figure><img src="/img/20250521-pm2_gnd/sec2a.png"><figcaption>
+      <h4>Baseline sec2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/seas2.png"><figcaption>
+      <h4>seas2.gnd used as sec2.gnd; background changed successfully</h4>
+    </figcaption>
+</figure>
+
+<p>I strongly suspect the odd colors are caused by decoding with a different palette. This is promising—there are two distinct decoding routines for the background images. One routine uses two palettes. All good!</p>
+<h2 id="entropy-analysis">Entropy Analysis</h2>
+<p>Using a hex editor, I took a quick peek at the <code>.gnd</code> files and, unlike the <code>.vga</code> files, they appear to be compressed. To confirm this, I measured the files’ entropy with a tool like <a href="https://github.com/ReFirmLabs/binwalk">binwalk</a>. Binwalk calculates Shannon entropy over fixed-size windows (1024 bytes each), giving a snapshot of how “random” each region is. An entropy of 0 bits/byte means all bytes are identical, whereas 8 bits/byte indicates perfectly random data. Higher entropy corresponds to higher information content. I like to think of it as how surprised you are by the next byte: if you see many consecutive identical bytes, each repeat is unsurprising—and thus low entropy.</p>
+<p>The binwalk algorithm is straightforward:</p>
+<ol>
+<li>Read 1024 bytes (offset 0–1023).</li>
+<li>Count the occurrences of each byte (build a 256-element histogram).</li>
+<li>Divide each byte count by 1024 to calculate its frequency.</li>
+<li>Compute the <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a> for this window.</li>
+<li>Move on to the next 1024 bytes (1024–2047) and repeat.</li>
+</ol>
+<p>Running the following commands will log the raw entropy data and generate entropy graphs for each file type.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>binwalk sponsors.vga --entropy --log sponsors2.txt
+</span></span><span style="display:flex;"><span>binwalk sec2.gnd     --entropy --log sec2.txt
+</span></span></code></pre></div><p>In the images below, the Y-axis (0 – 8 bits/byte) shows the entropy for each 1024-byte block. <code>sponsors.vga</code> never exceeds about 3.5 bits/byte, whereas <code>sec2.gnd</code> sits around 6.3 bits/byte—implying a high degree of randomness and suggesting a pretty good compression mechanism.</p>
+<figure><img src="/img/20250521-pm2_gnd/entropy-sec2_gnd.png"><figcaption>
+      <h4>sec2.gnd has high entropy, suggesting compression</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/entropy-sponsors_vga.png"><figcaption>
+      <h4>sponsors.vga has low entropy, suggesting no compression</h4>
+    </figcaption>
+</figure>
+
+<h2 id="displaying-palette-data">Displaying Palette Data</h2>
+<p>I have a hunch I&rsquo;ll spend a lot of time examining the raw compressed files alongside their rendered images. The first step is to map each pixel byte (0x00–0xFF) to its corresponding RGB color. Since I&rsquo;m a visual thinker, it&rsquo;s most helpful to have a full color matrix at hand. Here’s a small <a href="https://github.com/nunoalves/PM2_Legacy/blob/dcfd3712b4d847e2f3a52ea28f6856f5915293ec/tools/printPalette.py#L1">Python script</a> that generates exactly that matrix.</p>
+<p>To run it locally:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 tools/printPalette.py ../assets/paldata.vga paldata_16.bmp --base <span style="color:#ae81ff">16</span>
+</span></span></code></pre></div><figure><img src="/img/20250521-pm2_gnd/paldata_16.bmp"><figcaption>
+      <h4>Main game palette colors, extracted from paldata.vga</h4>
+    </figcaption>
+</figure>
+
+<h2 id="first-steps-1">First Steps</h2>
+<p>I am still unsure what the format of this compressed file is, but juding from the time this game was made (~1992), I strongly suspect this compressed file is a either a custom variant of RLE or LZSS algorithm. Most likely is a combo of box, so I’ll use that as my starting point.</p>
+<p>To make my life easier, I’ll focus only on the smallest files that use the same compression scheme: <code>fax.gnd</code>, <code>gndcove2.gnd</code>, and <code>sponsor2.gnd</code>.</p>
+<p>Using a hex editor (e.g. HexFiend), I compare the first hundred or so bytes of each file, looking for patterns.<br>
+<figure><img src="/img/20250521-pm2_gnd/firstBytesComparison.png"><figcaption>
+      <h4>Comparing the first bytes of each file</h4>
+    </figcaption>
+</figure>
+</p>
+<p>Normally, LZSS-compressed data begins with header metadata. The first two bytes of both <code>gndcove2.gnd</code> and <code>sponsor2.gnd</code> are identical. I’m not yet sure what they represent, but I suspect they relate to the image size, since both files display at the same dimensions in-game.</p>
+<p>Next, I’ll analyze the <code>sponsor2.gnd</code> image. I also assume it renders top-to-bottom. Looking at the pixels, the initial pattern is “GREY WHITE WHITE GREY WHITE WHITE GREY WHITE WHITE.”<br>
+<figure><img src="/img/20250521-pm2_gnd/sponsors2_zoomed.png"><figcaption>
+      <h4>Zoomed-in view of the original sponsor2.gnd file.</h4>
+    </figcaption>
+</figure>
+</p>
+<p>The first bytes are <code>0x03 0x54 0x3A 0x3A 0x81</code>. According to the palette matrix above, <code>0x3A</code> is white and <code>0x81</code> is blue. If I change the first <code>0x3A</code> to <code>0x35</code>, some white pixels should turn red.<br>
+<figure><img src="/img/20250521-pm2_gnd/sponsors2-first_3A_replaced_with_35.png"><figcaption>
+      <h4>Replacing the first 0x3A with 0x35 in sponsor2.gnd results in the first white pixel (and many downstream pixels) turning red.</h4>
+    </figcaption>
+</figure>
+</p>
+<p>After a few more trials, errors, and investigations, here’s what I’ve discovered:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Byte</th>
+          <th>Original (HEX) value</th>
+          <th>Purpose</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>0</td>
+          <td><code>03</code></td>
+          <td>maybe next 3 bytes are literal</td>
+      </tr>
+      <tr>
+          <td>1</td>
+          <td><code>54</code></td>
+          <td>pixel #1 (grey)</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td><code>3A</code></td>
+          <td>pixel #2 (white)</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td><code>3A</code></td>
+          <td>pixel #3 (white)</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td><code>81 0A</code></td>
+          <td>maybe look back 3, copy 3</td>
+      </tr>
+      <tr>
+          <td>6</td>
+          <td><code>C8 00</code></td>
+          <td>maybe look back 6, copy 6</td>
+      </tr>
+      <tr>
+          <td>8</td>
+          <td><code>C8 06</code></td>
+          <td>maybe look back 12, copy 8</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td><code>03</code></td>
+          <td>maybe next 3 bytes are literal</td>
+      </tr>
+      <tr>
+          <td>11</td>
+          <td><code>EA</code></td>
+          <td>pixel #21 (blue)</td>
+      </tr>
+      <tr>
+          <td>12</td>
+          <td><code>54</code></td>
+          <td>pixel #22 (grey)</td>
+      </tr>
+      <tr>
+          <td>13</td>
+          <td><code>EA</code></td>
+          <td>pixel #23 (blue)</td>
+      </tr>
+  </tbody>
+</table>
+<p>It appears that the first byte specifies how many subsequent bytes are literal values. Bytes 1–3 are  literal pixel values, followed by a sequence of back-reference bytes and then more literals. My hypothesis of a custom RLE compression start gaining traction.</p>
+<p>Below is a cleaner, more concise version of the post, ready to drop into a Hugo <code>*.md</code> file.  I fixed typos, tightened wording, and used fenced code-blocks so the hex snippets render nicely.</p>
+<h2 id="decoding-the-gnd-files">Decoding the <code>.gnd</code> Files</h2>
+<p>After some byte-tweaking I reached four conclusions about the compression format:</p>
+<ol>
+<li>Every byte in the stream is an <strong>opcode</strong> (command) or its argument.</li>
+<li>The <strong>first</strong> byte of a file is always an opcode.</li>
+<li>Opcodes may have 0, 1, or 2 argument bytes.</li>
+<li>“Copy” opcodes reference <strong>previously decoded bytes</strong> (already-drawn
+pixels); they never look ahead.</li>
+</ol>
+<p>My workflow was simple:</p>
+<ol>
+<li>Pick a <code>.gnd</code> file, spot patterns in the raw bytes vs. on-screen pixels.</li>
+<li>Guess the meaning of an opcode.</li>
+<li>Implement that guess in Python.</li>
+<li>Re-decode the image—if something looked wrong I knew either my guess or my
+code was off.</li>
+</ol>
+<p>Below are a few annotated byte traces extracted from the various files I used to get the ball rolling&hellip;</p>
+<hr>
+<h3 id="literal--repeat-samples">Literal &amp; Repeat Samples</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>mainoff2.gnd
+</span></span><span style="display:flex;"><span>43 3B 01 5F 44 3A 00
+</span></span><span style="display:flex;"><span>    -&gt; 5x orange(3B) 1x green(5F) 7x white(3A)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result.gnd
+</span></span><span style="display:flex;"><span>61 1B 35 00
+</span></span><span style="display:flex;"><span>    -&gt; row-fill: 319x red(35) (one full 320-pixel row minus the last pixel)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>phonpic2.gnd
+</span></span><span style="display:flex;"><span>60 02 35 00
+</span></span><span style="display:flex;"><span>    -&gt; 38x red(35)
+</span></span></code></pre></div><h3 id="small-copy-sequences">Small “Copy” Sequences</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>padpic2.gnd
+</span></span><span style="display:flex;"><span>04 3B 5F 3A 35 00
+</span></span><span style="display:flex;"><span>    -&gt; orange, green, white, red
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>04 3B 5F 3A 35 43 C2 00
+</span></span><span style="display:flex;"><span>    -&gt; above + 6x brown(C2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>04 3B 5F 3A 35 43 C2 85 01 C0 00
+</span></span><span style="display:flex;"><span>    -&gt; above + red + brown + light-brown(C0)
+</span></span></code></pre></div><h3 id="long-repeat--copy-mix">Long Repeat &amp; Copy Mix</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>matchpic.gnd
+</span></span><span style="display:flex;"><span>63 AD 35 00
+</span></span><span style="display:flex;"><span>    -&gt; about 3.5 rows of red(35)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>63 AD 35 02 3A 3A 00
+</span></span><span style="display:flex;"><span>    -&gt; above + 2x white(3A)
+</span></span></code></pre></div><h3 id="experimenting-with-fill-opcodes">Experimenting With “Fill” Opcodes</h3>
+<p>Replacing the entire file with a single opcode trio and you get predictable spans:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>40 35 00  -&gt; 3x red
+</span></span><span style="display:flex;"><span>47 35 00  -&gt; 10x red
+</span></span><span style="display:flex;"><span>4E 35 00  -&gt; 17x red
+</span></span><span style="display:flex;"><span>5F 35 00  -&gt; 34x red
+</span></span><span style="display:flex;"><span>60 1C 35 00 -&gt; 64x red
+</span></span><span style="display:flex;"><span>61 1C 35 00 -&gt; 320x red (full row)
+</span></span></code></pre></div><hr>
+<h3 id="complete-gnd-opcode-reference">Complete <strong><code>.gnd</code></strong> Opcode Reference</h3>
+<table>
+  <thead>
+      <tr>
+          <th>Opcode value(s)</th>
+          <th>Argument bytes</th>
+          <th>Mnemonic<!-- raw HTML omitted -->*<!-- raw HTML omitted --></th>
+          <th>Action (pseudocode)</th>
+          <th>Typical effect</th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>00</code></td>
+          <td>—</td>
+          <td><strong>END</strong></td>
+          <td><code>stop()</code></td>
+          <td>Terminates the stream</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>01–1F</code></td>
+          <td><em>N</em> literals</td>
+          <td><strong>LIT N</strong></td>
+          <td><code>copy(src[pos+1 : pos+1+N])</code></td>
+          <td>Copy the next 1-31 raw bytes</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>40–5F</code></td>
+          <td><code>vv</code></td>
+          <td><strong>RPT m×vv</strong></td>
+          <td><code>m = (opcode &amp; 0x3F) + 3</code> <!-- raw HTML omitted --> <code>repeat(vv, m)</code></td>
+          <td>Short run-length repeat (3-34 pixels)</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>60–7F</code></td>
+          <td><code>xx vv</code></td>
+          <td><strong>RPT n×vv</strong></td>
+          <td><code>n = ((opcode &amp; 0x1F)&lt;&lt;8) + xx + 36</code> <!-- raw HTML omitted --> <code>repeat(vv, n)</code></td>
+          <td>Long repeat (≥ 36). Values near 320 give full-row fills</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>80–9F</code></td>
+          <td><code>yy</code></td>
+          <td><strong>CPY2 off=d</strong></td>
+          <td><code>d = yy + 2</code> <!-- raw HTML omitted --> <code>copy_back(d, 2)</code></td>
+          <td>Copy 2 pixels from up to 257 bytes back</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>A0–BF</code></td>
+          <td><code>yy</code></td>
+          <td><strong>CPY3 off=d</strong></td>
+          <td><code>d = yy + 3</code> <!-- raw HTML omitted --> <code>copy_back(d, 3)</code></td>
+          <td>Copy 3 pixels from up to 258 bytes back</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>C0–FF</code></td>
+          <td><code>yy</code></td>
+          <td><strong>CPYk off=d</strong></td>
+          <td><code>grp = (opcode&gt;&gt;4) − 0xC</code>  <!-- raw HTML omitted --> base = 4,8,12,16 <!-- raw HTML omitted --> <code>extra = (opcode&gt;&gt;2)&amp;3</code>  <!-- raw HTML omitted --> <em>k = base+extra</em> (4-19) <!-- raw HTML omitted --> <code>window = opcode &amp; 0x03</code> <!-- raw HTML omitted --> <code>offset = (window&lt;&lt;8)</code> | <code>yy</code> (0-1023) <!-- raw HTML omitted --> <code>d = offset + k</code> <!-- raw HTML omitted --> <code>copy_back(d, k)</code></td>
+          <td>General copy-back (length 4-19, distance ≥ length, max ≈ 1042)</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<p><!-- raw HTML omitted -->* Mnemonic legend<!-- raw HTML omitted --></p>
+<ul>
+<li><strong>LIT N</strong>    copy <em>N</em> literal bytes</li>
+<li><strong>RPT m×vv</strong>   repeat byte <code>vv</code> <em>m</em> times</li>
+<li><strong>CPYk off=d</strong> copy <em>k</em> bytes from <code>d</code> positions back in the output buffer</li>
+</ul>
+<h2 id="the-decoder-script">The Decoder Script</h2>
+<p>I wrote a small Python tool,
+<a href="https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py"><code>gndToBmp.py</code></a>,
+that:</p>
+<ul>
+<li>walks the stream opcode-by-opcode,</li>
+<li>shows a live log of each operation,</li>
+<li>writes an updated BMP after every opcode when <code>--step</code> is enabled.</li>
+</ul>
+<p>Run it like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 gndToBmp.py ~/dosbox/pm2/gndcove2.gnd <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     ../assets/paldata.vga           <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     --scale <span style="color:#ae81ff">5</span>                       <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>     --step
+</span></span></code></pre></div><p>The options mean:</p>
+<ul>
+<li><strong><code>--scale 5</code></strong> – enlarge the output BMP 5×.</li>
+<li><strong><code>--step</code></strong>   – pause after every opcode, write
+<code>step_0001.bmp</code>, <code>step_0002.bmp</code>, … alongside the log.</li>
+</ul>
+<figure><img src="/img/20250521-pm2_gnd/step_0276.bmp"><figcaption>
+      <h4>Bitmap after 276 decoded opcodes</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/step_0561.bmp"><figcaption>
+      <h4>Bitmap after 561 decoded opcodes</h4>
+    </figcaption>
+</figure>
+
+<p>Here is the main terminal window showing the decoding for each instruction, where:</p>
+<ul>
+<li><strong><code>LIT N</code></strong> – copy <em>N</em> literal bytes that follow</li>
+<li><strong><code>RPTm×VV</code></strong> – repeat byte <code>0xVV</code> <em>m</em> times</li>
+<li><strong><code>CPYk off=D</code></strong> – copy <em>k</em> bytes from <em>D</em> positions back in the history
+<ul>
+<li><code>CPY2</code> opcodes live in <strong>80–9F</strong></li>
+<li><code>CPY3</code> opcodes live in <strong>A0–BF</strong></li>
+<li><code>CPY4–CPY19</code> opcodes live in <strong>C0–FF</strong></li>
+</ul>
+</li>
+</ul>
+<figure><img src="/img/20250521-pm2_gnd/trace_command.png"><figcaption>
+      <h4>Live trace: frame #, file offset, raw bytes, and decoded meaning</h4>
+    </figcaption>
+</figure>
+
+<h2 id="decoded-images">Decoded Images</h2>
+<p>Here are the results of running the decoding tool <a href="https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py"><code>gndToBmp.py</code></a>, on the various images.</p>
+<figure><img src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp"><figcaption>
+      <h4>mainoff2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/result.gnd.bmp"><figcaption>
+      <h4>result.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/diskpic2.gnd.bmp"><figcaption>
+      <h4>diskpic2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/phonpic2.gnd.bmp"><figcaption>
+      <h4>phonpic2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/padpic2.gnd.bmp"><figcaption>
+      <h4>padpic2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/matchpic.gnd.bmp"><figcaption>
+      <h4>matchpic.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/anim.gnd.bmp"><figcaption>
+      <h4>anim.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/monitor.gnd.bmp"><figcaption>
+      <h4>monitor.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/gndcove2.gnd.bmp"><figcaption>
+      <h4>gndcove2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/sponsor2.gnd.bmp"><figcaption>
+      <h4>sponsor2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/fax.gnd.bmp"><figcaption>
+      <h4>fax.gnd</h4>
+    </figcaption>
+</figure>
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+<p>Figuring out a compression protocol without reverse-engineering the executable was actually a lot more fun than playing the game. The protocol itself feels tacked together. Also, different images apparently need a different decoding protocol (which I’ll check out another time). I’m a little confused why they made a custom RLE implementation with strange offsets, rather than using a canned LZSS implementation that’s been around since 1982 (or one of its later variants, like LZW). Anyway, it seems <a href="https://moddingwiki.shikadi.net/wiki/RLE_Compression#Code">others</a> have done similar things, so it must be okay. Maybe in one of my next posts I’ll compare this with other early-1990s compression schemes—to see what the Premier Manager 2 team were drinking :)</p>
+
+		</div>
+		<footer class="post__footer">
+			
+<div class="post__tags tags clearfix">
+	<svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M4 0h8s2 0 4 2l15 15s2 2 0 4L21 31s-2 2-4 0L2 16s-2-2-2-4V3s0-3 4-3m3 10a3 3 0 0 0 0-6 3 3 0 0 0 0 6"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/dos/" rel="tag">DOS</a>
+		</li>
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/retro-gaming/" rel="tag">Retro Gaming</a>
+		</li>
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/reverse-engineering/" rel="tag">Reverse Engineering</a>
+		</li>
+	</ul>
+</div>
+		</footer>
+	</article>
+</main>
+
+
+
+
+			</div>
+			
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2025 ohNoNuNo.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

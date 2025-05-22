@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Reverse Engineering on ohNoNuNo</title>
+    <link>http://localhost:1313/tags/reverse-engineering/</link>
+    <description>Recent content in Reverse Engineering on ohNoNuNo</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 12 May 2025 19:53:19 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/reverse-engineering/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reverse Engineering Backgrounds From Premier Manager 2</title>
+      <link>http://localhost:1313/posts/pm2-image-extraction-part-2/</link>
+      <pubDate>Mon, 12 May 2025 19:53:19 -0400</pubDate>
+      <guid>http://localhost:1313/posts/pm2-image-extraction-part-2/</guid>
+      <description>&lt;p&gt;So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (&lt;code&gt;.gnd&lt;/code&gt;) files. A year or so ago, I worked on the &lt;code&gt;.vga&lt;/code&gt; files, so now it’s time to try decoding the &lt;code&gt;.gnd&lt;/code&gt; files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Extracting Assets From Premier Manager 2</title>
+      <link>http://localhost:1313/posts/pm2-image-extraction-part-1/</link>
+      <pubDate>Sat, 20 Apr 2024 14:30:00 -0400</pubDate>
+      <guid>http://localhost:1313/posts/pm2-image-extraction-part-1/</guid>
+      <description>&lt;p&gt;About once every five years I fire up &lt;em&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Premier_Manager_2&#34;&gt;Premier Manager 2&lt;/a&gt;&lt;/em&gt; — THE soccer management game before &lt;em&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Championship_Manager_93/94&#34;&gt;Championship Manager&lt;/a&gt;&lt;/em&gt; monopolised the genre. (These days, you can even play &lt;a href=&#34;https://archive.org/details/msdos_Premier_Manager_2_1993&#34;&gt;PM2 in your browser&lt;/a&gt;.)&lt;/p&gt;&#xA;&lt;p&gt;Before starting to play, this time I noticed an interesting mix of files in the root directory — thingslike &lt;code&gt;contract.gnd&lt;/code&gt;, &lt;code&gt;icons.vga&lt;/code&gt;, &lt;code&gt;anim.bin&lt;/code&gt;, &lt;code&gt;goal.voc&lt;/code&gt;, and others—and wondered how hard it would be to decode them with modern tooling. Surely the &lt;code&gt;.gnd&lt;/code&gt; and &lt;code&gt;.vga&lt;/code&gt; files were graphic assets, the &lt;code&gt;.voc&lt;/code&gt; files audio, and so on. A little reverse‑engineering later, here’s what I found about the image formats&amp;hellip;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

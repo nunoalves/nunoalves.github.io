@@ -2,7 +2,7 @@
 title = "Extracting Assets From Premier Manager 2"
 date  = "2024-04-20T14:30:00-04:00"
 draft = false
-tags  = ["DOS", "Retro Gaming"]
+tags  = ["DOS", "Retro Gaming", "Reverse Engineering"]
 thumbnail = "img/20240420-pm2_assets/thumb.bmp"
 +++
 
