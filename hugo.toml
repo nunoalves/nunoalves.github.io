@@ -16,6 +16,7 @@ theme = "mainroad" #https://github.com/Vimux/Mainroad/
 [taxonomies]
   tag = "tags"
   category = "categories"
+  series = "series"
 
 [params.widgets.social]
   cached = false # activate cache if true
@@ -25,10 +26,10 @@ theme = "mainroad" #https://github.com/Vimux/Mainroad/
 
 [params]
   dateformat = "January 2, 2006"
-  post_meta = ["author", "date", "categories", "translations"]
-  toc = true # Enable Table of Contents
-  mainSections = ["posts"] # Specify section pages to show on home page and the "Recent articles" widget
-  schema = true # Enable Schema
+  post_meta = ["author","date","categories","translations"]
+  toc = true
+  mainSections = ["posts"] 
+  schema = true 
 
 #[params.thumbnail]
 #  visibility = ["list", "post"] # Control thumbnail visibility

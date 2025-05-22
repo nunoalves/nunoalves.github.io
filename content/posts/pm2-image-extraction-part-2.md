@@ -1,9 +1,10 @@
 +++
 date = '2025-05-21T23:02:19-04:00'
 draft = false
-title = 'Reverse Engineering Backgrounds From Premier Manager 2'
+title = 'Decoding and Decompressing PM2’s Background Images'
 tags = ["DOS", "Retro Gaming", "Reverse Engineering"]
 thumbnail = "img/20250521-pm2_gnd/mainoff2.gnd.bmp"
+categories = ["PM2 Reverse Engineering"]
 +++
 
 So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (`.gnd`) files. A year or so ago, I worked on the `.vga` files, so now it’s time to try decoding the `.gnd` files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!

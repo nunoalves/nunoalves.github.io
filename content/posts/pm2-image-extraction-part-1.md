@@ -1,9 +1,10 @@
 +++
-title = "Extracting Assets From Premier Manager 2"
+title = "Reverse-Engineering Premier Manager 2’s VGA Graphics"
 date  = "2024-04-20T14:30:00-04:00"
 draft = false
 tags  = ["DOS", "Retro Gaming", "Reverse Engineering"]
 thumbnail = "img/20240420-pm2_assets/thumb.bmp"
+categories = ["PM2 Reverse Engineering"]
 +++
 
 About once every five years I fire up *[Premier Manager 2](https://en.wikipedia.org/wiki/Premier_Manager_2)* — THE soccer management game before *[Championship Manager](https://en.wikipedia.org/wiki/Championship_Manager_93/94)* monopolised the genre. (These days, you can even play [PM2 in your browser](https://archive.org/details/msdos_Premier_Manager_2_1993).)
