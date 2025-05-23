@@ -9,14 +9,14 @@
     <lastBuildDate>Wed, 21 May 2025 23:02:19 -0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/reverse-engineering/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Reverse Engineering Backgrounds From Premier Manager 2</title>
+      <title>Decoding and Decompressing PM2’s Background Images</title>
       <link>http://localhost:1313/posts/pm2-image-extraction-part-2/</link>
       <pubDate>Wed, 21 May 2025 23:02:19 -0400</pubDate>
       <guid>http://localhost:1313/posts/pm2-image-extraction-part-2/</guid>
       <description>&lt;p&gt;So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (&lt;code&gt;.gnd&lt;/code&gt;) files. A year or so ago, I worked on the &lt;code&gt;.vga&lt;/code&gt; files, so now it’s time to try decoding the &lt;code&gt;.gnd&lt;/code&gt; files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!&lt;/p&gt;</description>
     </item>
     <item>
-      <title>Extracting Assets From Premier Manager 2</title>
+      <title>Reverse-Engineering Premier Manager 2’s VGA Graphics</title>
       <link>http://localhost:1313/posts/pm2-image-extraction-part-1/</link>
       <pubDate>Sat, 20 Apr 2024 14:30:00 -0400</pubDate>
       <guid>http://localhost:1313/posts/pm2-image-extraction-part-1/</guid>

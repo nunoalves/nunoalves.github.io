@@ -11,7 +11,7 @@
   <meta itemprop="description" content="So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (.gnd) files. A year or so ago, I worked on the .vga files, so now it’s time to try decoding the .gnd files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!">
   <meta itemprop="datePublished" content="2025-05-21T23:02:19-04:00">
   <meta itemprop="dateModified" content="2025-05-21T23:02:19-04:00">
-  <meta itemprop="wordCount" content="2201">
+  <meta itemprop="wordCount" content="2136">
   <meta itemprop="keywords" content="DOS,Retro Gaming,Reverse Engineering">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -292,7 +292,6 @@
   </tbody>
 </table>
 <p>It appears that the first byte specifies how many subsequent bytes are literal values. Bytes 1–3 are  literal pixel values, followed by a sequence of back-reference bytes and then more literals. My hypothesis of a custom RLE compression start gaining traction.</p>
-<p>Below is a cleaner, more concise version of the post, ready to drop into a Hugo <code>*.md</code> file.  I fixed typos, tightened wording, and used fenced code-blocks so the hex snippets render nicely.</p>
 <h2 id="decoding-the-gnd-files">Decoding the <code>.gnd</code> Files</h2>
 <p>After some byte-tweaking I reached four conclusions about the compression format:</p>
 <ol>
@@ -359,7 +358,6 @@ code was off.</li>
           <th>Mnemonic<!-- raw HTML omitted -->*<!-- raw HTML omitted --></th>
           <th>Action (pseudocode)</th>
           <th>Typical effect</th>
-          <th></th>
       </tr>
   </thead>
   <tbody>
@@ -369,7 +367,6 @@ code was off.</li>
           <td><strong>END</strong></td>
           <td><code>stop()</code></td>
           <td>Terminates the stream</td>
-          <td></td>
       </tr>
       <tr>
           <td><code>01–1F</code></td>
@@ -377,7 +374,6 @@ code was off.</li>
           <td><strong>LIT N</strong></td>
           <td><code>copy(src[pos+1 : pos+1+N])</code></td>
           <td>Copy the next 1-31 raw bytes</td>
-          <td></td>
       </tr>
       <tr>
           <td><code>40–5F</code></td>
@@ -385,15 +381,13 @@ code was off.</li>
           <td><strong>RPT m×vv</strong></td>
           <td><code>m = (opcode &amp; 0x3F) + 3</code> <!-- raw HTML omitted --> <code>repeat(vv, m)</code></td>
           <td>Short run-length repeat (3-34 pixels)</td>
-          <td></td>
       </tr>
       <tr>
           <td><code>60–7F</code></td>
           <td><code>xx vv</code></td>
           <td><strong>RPT n×vv</strong></td>
           <td><code>n = ((opcode &amp; 0x1F)&lt;&lt;8) + xx + 36</code> <!-- raw HTML omitted --> <code>repeat(vv, n)</code></td>
-          <td>Long repeat (≥ 36). Values near 320 give full-row fills</td>
-          <td></td>
+          <td>Long repeat (≥ 36)</td>
       </tr>
       <tr>
           <td><code>80–9F</code></td>
@@ -401,7 +395,6 @@ code was off.</li>
           <td><strong>CPY2 off=d</strong></td>
           <td><code>d = yy + 2</code> <!-- raw HTML omitted --> <code>copy_back(d, 2)</code></td>
           <td>Copy 2 pixels from up to 257 bytes back</td>
-          <td></td>
       </tr>
       <tr>
           <td><code>A0–BF</code></td>
@@ -409,15 +402,13 @@ code was off.</li>
           <td><strong>CPY3 off=d</strong></td>
           <td><code>d = yy + 3</code> <!-- raw HTML omitted --> <code>copy_back(d, 3)</code></td>
           <td>Copy 3 pixels from up to 258 bytes back</td>
-          <td></td>
       </tr>
       <tr>
           <td><code>C0–FF</code></td>
           <td><code>yy</code></td>
           <td><strong>CPYk off=d</strong></td>
-          <td><code>grp = (opcode&gt;&gt;4) − 0xC</code>  <!-- raw HTML omitted --> base = 4,8,12,16 <!-- raw HTML omitted --> <code>extra = (opcode&gt;&gt;2)&amp;3</code>  <!-- raw HTML omitted --> <em>k = base+extra</em> (4-19) <!-- raw HTML omitted --> <code>window = opcode &amp; 0x03</code> <!-- raw HTML omitted --> <code>offset = (window&lt;&lt;8)</code> | <code>yy</code> (0-1023) <!-- raw HTML omitted --> <code>d = offset + k</code> <!-- raw HTML omitted --> <code>copy_back(d, k)</code></td>
+          <td><code>d = offset + k</code> <!-- raw HTML omitted --> <code>copy_back(d, k)</code></td>
           <td>General copy-back (length 4-19, distance ≥ length, max ≈ 1042)</td>
-          <td></td>
       </tr>
   </tbody>
 </table>

@@ -152,8 +152,6 @@ After a few more trials, errors, and investigations, here’s what I’ve discov
 
 It appears that the first byte specifies how many subsequent bytes are literal values. Bytes 1–3 are  literal pixel values, followed by a sequence of back-reference bytes and then more literals. My hypothesis of a custom RLE compression start gaining traction.
 
-Below is a cleaner, more concise version of the post, ready to drop into a Hugo `*.md` file.  I fixed typos, tightened wording, and used fenced code-blocks so the hex snippets render nicely.
-
 ## Decoding the `.gnd` Files
 
 After some byte-tweaking I reached four conclusions about the compression format:
@@ -234,22 +232,20 @@ Replacing the entire file with a single opcode trio and you get predictable span
 
 ### Complete **`.gnd`** Opcode Reference
 
-| Opcode value(s) | Argument bytes | Mnemonic<sup>*</sup>        | Action (pseudocode)                                                                                                                                         | Typical effect                                          |                                                                |
-| --------------- | -------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
-| `00`            | —              | **END**                     | `stop()`                                                                                                                                                    | Terminates the stream                                   |                                                                |
-| `01–1F`         | *N* literals   | **LIT N**                   | `copy(src[pos+1 : pos+1+N])`                                                                                                                                | Copy the next 1-31 raw bytes                            |                                                                |
-| `40–5F`         | `vv`           | **RPT m×vv**                | `m = (opcode & 0x3F) + 3` <br> `repeat(vv, m)`                                                                                                              | Short run-length repeat (3-34 pixels)                   |                                                                |
-| `60–7F`         | `xx vv`        | **RPT n×vv**                | `n = ((opcode & 0x1F)<<8) + xx + 36` <br> `repeat(vv, n)`                                                                                                   | Long repeat (≥ 36). Values near 320 give full-row fills |                                                                |
-| `80–9F`         | `yy`           | **CPY2 off=d**              | `d = yy + 2` <br> `copy_back(d, 2)`                                                                                                                         | Copy 2 pixels from up to 257 bytes back                 |                                                                |
-| `A0–BF`         | `yy`           | **CPY3 off=d**              | `d = yy + 3` <br> `copy_back(d, 3)`                                                                                                                         | Copy 3 pixels from up to 258 bytes back                 |                                                                |
-| `C0–FF`         | `yy`           | **CPYk off=d**              | `grp = (opcode>>4) − 0xC`  <br> base = 4,8,12,16 <br> `extra = (opcode>>2)&3`  <br> *k = base+extra* (4-19) <br> `window = opcode & 0x03` <br> `offset = (window<<8)` \| `yy` (0-1023) <br> `d = offset + k` <br> `copy_back(d, k)` | General copy-back (length 4-19, distance ≥ length, max ≈ 1042) |
+| Opcode value(s) | Argument bytes | Mnemonic<sup>*</sup>        | Action (pseudocode)                                         | Typical effect                                                 |        
+| --------------- | -------------- | --------------------------- | ------------------------------------------------------------| -------------------------------------------------------------- | 
+| `00`            | —              | **END**                     | `stop()`                                                    | Terminates the stream                                          | 
+| `01–1F`         | *N* literals   | **LIT N**                   | `copy(src[pos+1 : pos+1+N])`                                | Copy the next 1-31 raw bytes                                   | 
+| `40–5F`         | `vv`           | **RPT m×vv**                | `m = (opcode & 0x3F) + 3` <br> `repeat(vv, m)`              | Short run-length repeat (3-34 pixels)                          | 
+| `60–7F`         | `xx vv`        | **RPT n×vv**                | `n = ((opcode & 0x1F)<<8) + xx + 36` <br> `repeat(vv, n)`   | Long repeat (≥ 36)                                             | 
+| `80–9F`         | `yy`           | **CPY2 off=d**              | `d = yy + 2` <br> `copy_back(d, 2)`                         | Copy 2 pixels from up to 257 bytes back                        | 
+| `A0–BF`         | `yy`           | **CPY3 off=d**              | `d = yy + 3` <br> `copy_back(d, 3)`                         | Copy 3 pixels from up to 258 bytes back                        | 
+| `C0–FF`         | `yy`           | **CPYk off=d**              | `d = offset + k` <br> `copy_back(d, k)`                     | General copy-back (length 4-19, distance ≥ length, max ≈ 1042) |
 
 <sup>* Mnemonic legend</sup>
-
 * **LIT N**    copy *N* literal bytes
 * **RPT m×vv**   repeat byte `vv` *m* times
 * **CPYk off=d** copy *k* bytes from `d` positions back in the output buffer
-
 
 ## The Decoder Script
 
