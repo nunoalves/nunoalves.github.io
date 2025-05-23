@@ -8,10 +8,10 @@
 	<meta name="description" content="">
 		
   <meta itemprop="name" content="Decoding and Decompressing PM2’s Background Images">
-  <meta itemprop="description" content="So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (.gnd) files. A year or so ago, I worked on the .vga files, so now it’s time to try decoding the .gnd files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!">
+  <meta itemprop="description" content="So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (.gnd) files. A year or so ago, I worked on the .vga files, so now it’s time to try decoding the .gnd files. I haven’t touched this in a while, so I’m not sure how far I got last time. Without further ado, let’s start!">
   <meta itemprop="datePublished" content="2025-05-21T23:02:19-04:00">
   <meta itemprop="dateModified" content="2025-05-21T23:02:19-04:00">
-  <meta itemprop="wordCount" content="2136">
+  <meta itemprop="wordCount" content="2235">
   <meta itemprop="keywords" content="DOS,Retro Gaming,Reverse Engineering">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -86,7 +86,7 @@
 </nav>
 	</div>
 </div><div class="content post__content clearfix">
-			<p>So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (<code>.gnd</code>) files. A year or so ago, I worked on the <code>.vga</code> files, so now it’s time to try decoding the <code>.gnd</code> files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!</p>
+			<p>So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (<code>.gnd</code>) files. A year or so ago, I worked on the <code>.vga</code> files, so now it’s time to try decoding the <code>.gnd</code> files. I haven’t touched this in a while, so I’m not sure how far I got last time. Without further ado, let’s start!</p>
 <p>Judging by the filenames, the <code>.gnd</code> files are background images. The easiest way to begin is to find a way to reliably display a specific image in the game, inspect the file for patterns, and then modify it byte by byte to see the effects.</p>
 <p>I’m doing this on my Mac, but you can use whatever OS you prefer. I’m using <a href="https://dosbox-x.com">DosBox-X</a> as my DOS emulator.</p>
 <h2 id="first-steps">First Steps</h2>
@@ -122,7 +122,7 @@
 </span></span></code></pre></div><p>So, <code>sponsor2.gnd</code> is the smallest, so it should be the easiest to understand and decode. To find out where it appears in-game, back it up and replace its contents with another file (for example, <code>sec2.gnd</code>):</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mv sponsor2.gnd sponsor2.bak
 </span></span><span style="display:flex;"><span>cp sec2.gnd sponsor2.gnd
-</span></span></code></pre></div><p>Weirdly, PM2 crashes whenever the sponsors window is clicked—suggesting a format mismatch. That crash was a godsend, because now I know <code>sponsor2.gnd</code> is rendered behind the sponsors icon on the main screen:
+</span></span></code></pre></div><p>Weirdly, PM2 crashes whenever the sponsors window is clicked—suggesting either a format or size mismatch. I suspect a size mismatch. In any case, that crash was a godsend, because now I know <code>sponsor2.gnd</code> is rendered behind the sponsors icon on the main screen:
 <figure><img src="/img/20250521-pm2_gnd/sec2.png"><figcaption>
       <h4>Copying sec2.gnd to sponsor2.gnd crashes PM2</h4>
     </figcaption>
@@ -151,7 +151,7 @@
 <code>mainoff2.gnd</code>, <code>result.gnd</code>, <code>diskpic2.gnd</code>, <code>phonpic2.gnd</code>, <code>padpic2.gnd</code>, <code>matchpic.gnd</code>, <code>anim.gnd</code>, <code>monitor.gnd</code>, <code>gndcove2.gnd</code>, <code>fax.gnd</code></p>
 </li>
 </ul>
-<p>It looks like certain <code>.gnd</code> files are decoded differently—dubious! In any case, since <code>sec2.gnd</code> appears in the secretary window, let’s apply the same trick and see if the rest of the files can be decoded when their contents are copied into <code>sec2.gnd</code>.</p>
+<p>It looks like certain <code>.gnd</code> files have display sizes! In any case, since <code>sec2.gnd</code> appears in the secretary window, let’s apply the same trick and see if the rest of the files can be decoded when their contents are copied into <code>sec2.gnd</code>.</p>
 <ul>
 <li><strong>OK</strong>:
 <code>seas2.gnd</code>, <code>seas1.gnd</code>, <code>seas3.gnd</code>, <code>validpi2.gnd</code>, <code>sponsor1.gnd </code>, <code>sound.gnd</code>, <code>report.gnd</code>, <code>options2.gnd</code>, <code>gndpane2.gnd</code>, <code>gndside2.gnd</code>, <code>gndgoal2.gnd</code>, <code>tactic.gnd</code>, <code>namespic.gnd</code></li>
@@ -168,7 +168,7 @@
     </figcaption>
 </figure>
 
-<p>I strongly suspect the odd colors are caused by decoding with a different palette. This is promising—there are two distinct decoding routines for the background images. One routine uses two palettes. All good!</p>
+<p>I strongly suspect the odd colors are caused by decoding with a different palette. This is promising, because there are two palette files in the game assets. All good!</p>
 <h2 id="entropy-analysis">Entropy Analysis</h2>
 <p>Using a hex editor, I took a quick peek at the <code>.gnd</code> files and, unlike the <code>.vga</code> files, they appear to be compressed. To confirm this, I measured the files’ entropy with a tool like <a href="https://github.com/ReFirmLabs/binwalk">binwalk</a>. Binwalk calculates Shannon entropy over fixed-size windows (1024 bytes each), giving a snapshot of how “random” each region is. An entropy of 0 bits/byte means all bytes are identical, whereas 8 bits/byte indicates perfectly random data. Higher entropy corresponds to higher information content. I like to think of it as how surprised you are by the next byte: if you see many consecutive identical bytes, each repeat is unsurprising—and thus low entropy.</p>
 <p>The binwalk algorithm is straightforward:</p>
@@ -203,8 +203,8 @@
 </figure>
 
 <h2 id="first-steps-1">First Steps</h2>
-<p>I am still unsure what the format of this compressed file is, but juding from the time this game was made (~1992), I strongly suspect this compressed file is a either a custom variant of RLE or LZSS algorithm. Most likely is a combo of box, so I’ll use that as my starting point.</p>
-<p>To make my life easier, I’ll focus only on the smallest files that use the same compression scheme: <code>fax.gnd</code>, <code>gndcove2.gnd</code>, and <code>sponsor2.gnd</code>.</p>
+<p>I am still unsure what the format of this compressed file is, but judging from when this game was made (~1992), I strongly suspect the file uses a custom variant of RLE or LZSS. Most likely a combo of both, so I’ll use that as my starting point.</p>
+<p>To make my life easier, I’ll focus only on the smallest files that I can reliably read inside the game: <code>fax.gnd</code>, <code>gndcove2.gnd</code>, and <code>sponsor2.gnd</code>.</p>
 <p>Using a hex editor (e.g. HexFiend), I compare the first hundred or so bytes of each file, looking for patterns.<br>
 <figure><img src="/img/20250521-pm2_gnd/firstBytesComparison.png"><figcaption>
       <h4>Comparing the first bytes of each file</h4>
@@ -407,15 +407,15 @@ code was off.</li>
           <td><code>C0–FF</code></td>
           <td><code>yy</code></td>
           <td><strong>CPYk off=d</strong></td>
-          <td><code>d = offset + k</code> <!-- raw HTML omitted --> <code>copy_back(d, k)</code></td>
+          <td><code>d = offset + k</code> <!-- raw HTML omitted --> <code>copy_back(d, k)</code> (The full pseudocode logic is too unwieldy to fit here, see python script for details)</td>
           <td>General copy-back (length 4-19, distance ≥ length, max ≈ 1042)</td>
       </tr>
   </tbody>
 </table>
 <p><!-- raw HTML omitted -->* Mnemonic legend<!-- raw HTML omitted --></p>
 <ul>
-<li><strong>LIT N</strong>    copy <em>N</em> literal bytes</li>
-<li><strong>RPT m×vv</strong>   repeat byte <code>vv</code> <em>m</em> times</li>
+<li><strong>LIT N</strong> copy <em>N</em> literal bytes</li>
+<li><strong>RPT m×vv</strong> repeat byte <code>vv</code> <em>m</em> times</li>
 <li><strong>CPYk off=d</strong> copy <em>k</em> bytes from <code>d</code> positions back in the output buffer</li>
 </ul>
 <h2 id="the-decoder-script">The Decoder Script</h2>
@@ -466,14 +466,24 @@ that:</p>
 </figure>
 
 <h2 id="decoded-images">Decoded Images</h2>
-<p>Here are the results of running the decoding tool <a href="https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py"><code>gndToBmp.py</code></a>, on the various images.</p>
-<figure><img src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp"><figcaption>
-      <h4>mainoff2.gnd</h4>
+<p>Running all images through my script is simple. For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> inp in ~/dosbox/pm2/*.gnd; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  base<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>basename <span style="color:#e6db74">&#34;</span>$inp<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  python3 gndToBmp.py <span style="color:#e6db74">&#34;</span>$inp<span style="color:#e6db74">&#34;</span> ../assets/paldata.vga --scale <span style="color:#ae81ff">5</span> --out <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>base<span style="color:#e6db74">}</span><span style="color:#e6db74">.bmp&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span></code></pre></div><p>Here are the results of running the decoding tool <a href="https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py"><code>gndToBmp.py</code></a> on all the <code>.gnd</code> images. The crashes reported above were indeed due to different image sizes (trying to print more data to the screen than the buffer allowed), not a different compression scheme.</p>
+<p><figure><img src="/img/20250521-pm2_gnd/anim.gnd.bmp"><figcaption>
+      <h4>anim.gnd</h4>
     </figcaption>
 </figure>
 
-<figure><img src="/img/20250521-pm2_gnd/result.gnd.bmp"><figcaption>
-      <h4>result.gnd</h4>
+<figure><img src="/img/20250521-pm2_gnd/contract.gnd.bmp"><figcaption>
+      <h4>contract.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/credits.gnd.bmp"><figcaption>
+      <h4>credits.gnd</h4>
     </figcaption>
 </figure>
 
@@ -482,28 +492,8 @@ that:</p>
     </figcaption>
 </figure>
 
-<figure><img src="/img/20250521-pm2_gnd/phonpic2.gnd.bmp"><figcaption>
-      <h4>phonpic2.gnd</h4>
-    </figcaption>
-</figure>
-
-<figure><img src="/img/20250521-pm2_gnd/padpic2.gnd.bmp"><figcaption>
-      <h4>padpic2.gnd</h4>
-    </figcaption>
-</figure>
-
-<figure><img src="/img/20250521-pm2_gnd/matchpic.gnd.bmp"><figcaption>
-      <h4>matchpic.gnd</h4>
-    </figcaption>
-</figure>
-
-<figure><img src="/img/20250521-pm2_gnd/anim.gnd.bmp"><figcaption>
-      <h4>anim.gnd</h4>
-    </figcaption>
-</figure>
-
-<figure><img src="/img/20250521-pm2_gnd/monitor.gnd.bmp"><figcaption>
-      <h4>monitor.gnd</h4>
+<figure><img src="/img/20250521-pm2_gnd/fax.gnd.bmp"><figcaption>
+      <h4>fax.gnd</h4>
     </figcaption>
 </figure>
 
@@ -512,18 +502,129 @@ that:</p>
     </figcaption>
 </figure>
 
+<figure><img src="/img/20250521-pm2_gnd/gndgoal2.gnd.bmp"><figcaption>
+      <h4>gndgoal2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/gndpane2.gnd.bmp"><figcaption>
+      <h4>gndpane2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp"><figcaption>
+      <h4>mainoff2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/matchpic.gnd.bmp"><figcaption>
+      <h4>matchpic.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/monitor.gnd.bmp"><figcaption>
+      <h4>monitor.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/namespic.gnd.bmp"><figcaption>
+      <h4>namespic.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/options2.gnd.bmp"><figcaption>
+      <h4>options2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/padpic2.gnd.bmp"><figcaption>
+      <h4>padpic2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/phonpic2.gnd.bmp"><figcaption>
+      <h4>phonpic2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/report.gnd.bmp"><figcaption>
+      <h4>report.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/result.gnd.bmp"><figcaption>
+      <h4>result.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/seas1.gnd.bmp"><figcaption>
+      <h4>seas1.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/seas2.gnd.bmp"><figcaption>
+      <h4>seas2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/seas3.gnd.bmp"><figcaption>
+      <h4>seas3.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/sec2.gnd.bmp"><figcaption>
+      <h4>sec2.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/sound.gnd.bmp"><figcaption>
+      <h4>sound.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/sponsor1.gnd.bmp"><figcaption>
+      <h4>sponsor1.gnd</h4>
+    </figcaption>
+</figure>
+
 <figure><img src="/img/20250521-pm2_gnd/sponsor2.gnd.bmp"><figcaption>
       <h4>sponsor2.gnd</h4>
     </figcaption>
 </figure>
 
-<figure><img src="/img/20250521-pm2_gnd/fax.gnd.bmp"><figcaption>
-      <h4>fax.gnd</h4>
+<figure><img src="/img/20250521-pm2_gnd/tactic.gnd.bmp"><figcaption>
+      <h4>tactic.gnd</h4>
     </figcaption>
 </figure>
 
+<figure><img src="/img/20250521-pm2_gnd/titlepic.gnd.bmp"><figcaption>
+      <h4>titlepic.gnd</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/validpi2.gnd.bmp"><figcaption>
+      <h4>validpi2.gnd</h4>
+    </figcaption>
+</figure>
+</p>
+<p>The files <code>credits.gnd</code>, <code>titlepic.gnd</code>, and <code>contract.gnd</code> appear to have been generated with a different palette. Let’s use the other palette file (<code>paltitle.vga</code>) included with the game files:</p>
+<p><figure><img src="/img/20250521-pm2_gnd/credits_with_correct_palette.gnd.bmp"><figcaption>
+      <h4>credits.gnd with correct palette</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/contract_with_correct_palette.gnd.bmp"><figcaption>
+      <h4>contract.gnd with correct palette</h4>
+    </figcaption>
+</figure>
+
+<figure><img src="/img/20250521-pm2_gnd/titlepic_with_correct_palette.gnd.bmp"><figcaption>
+      <h4>titlepic.gnd with correct palette</h4>
+    </figcaption>
+</figure>
+</p>
 <h2 id="final-thoughts">Final Thoughts</h2>
-<p>Figuring out a compression protocol without reverse-engineering the executable was actually a lot more fun than playing the game. The protocol itself feels tacked together. Also, different images apparently need a different decoding protocol (which I’ll check out another time). I’m a little confused why they made a custom RLE implementation with strange offsets, rather than using a canned LZSS implementation that’s been around since 1982 (or one of its later variants, like LZW). Anyway, it seems <a href="https://moddingwiki.shikadi.net/wiki/RLE_Compression#Code">others</a> have done similar things, so it must be okay. Maybe in one of my next posts I’ll compare this with other early-1990s compression schemes—to see what the Premier Manager 2 team were drinking :)</p>
+<p>Figuring out a compression protocol without reverse-engineering the executable was actually a lot more fun than playing the game. The protocol itself feels tacked together. I’m a little confused why they made a custom RLE implementation with strange offsets, rather than using a canned LZSS implementation that’s been around since 1982 (or one of its later variants, like LZW). Anyway, it seems <a href="https://moddingwiki.shikadi.net/wiki/RLE_Compression#Code">others</a> have done similar things, so it must be okay. Maybe in one of my next posts I’ll compare this with other early-1990s compression schemes—to see what the Premier Manager 2 team were drinking :)</p>
 
 		</div>
 		<footer class="post__footer">

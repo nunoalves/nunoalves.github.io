@@ -7,7 +7,7 @@ thumbnail = "img/20250521-pm2_gnd/mainoff2.gnd.bmp"
 categories = ["PM2 Reverse Engineering"]
 +++
 
-So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (`.gnd`) files. A year or so ago, I worked on the `.vga` files, so now it’s time to try decoding the `.gnd` files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!
+So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (`.gnd`) files. A year or so ago, I worked on the `.vga` files, so now it’s time to try decoding the `.gnd` files. I haven’t touched this in a while, so I’m not sure how far I got last time. Without further ado, let’s start!
 
 Judging by the filenames, the `.gnd` files are background images. The easiest way to begin is to find a way to reliably display a specific image in the game, inspect the file for patterns, and then modify it byte by byte to see the effects.
 
@@ -45,7 +45,7 @@ ls -lSh *.gnd
 -rw-r--r--@ 1 nunoalves  staff   1.6K Dec 24  1996 gndcove2.gnd
 -rw-r--r--@ 1 nunoalves  staff   1.3K Dec 24  1996 fax.gnd
 -rw-r--r--@ 1 nunoalves  staff   1.3K Dec 24  1996 sponsor2.gnd
-````
+```
 
 So, `sponsor2.gnd` is the smallest, so it should be the easiest to understand and decode. To find out where it appears in-game, back it up and replace its contents with another file (for example, `sec2.gnd`):
 
@@ -54,7 +54,7 @@ mv sponsor2.gnd sponsor2.bak
 cp sec2.gnd sponsor2.gnd
 ```
 
-Weirdly, PM2 crashes whenever the sponsors window is clicked—suggesting a format mismatch. That crash was a godsend, because now I know `sponsor2.gnd` is rendered behind the sponsors icon on the main screen:
+Weirdly, PM2 crashes whenever the sponsors window is clicked—suggesting either a format or size mismatch. I suspect a size mismatch. In any case, that crash was a godsend, because now I know `sponsor2.gnd` is rendered behind the sponsors icon on the main screen:
 {{< figure src="/img/20250521-pm2_gnd/sec2.png" title="Copying sec2.gnd to sponsor2.gnd crashes PM2" >}}
 
 As a baseline, I restore the original `sponsor2.gnd` and check how the sponsors menu looks:
@@ -71,7 +71,7 @@ It seems some background files crash PM2 when copied into `sponsor2.gnd`. Let’
 * **OK**:
 	`mainoff2.gnd`, `result.gnd`, `diskpic2.gnd`, `phonpic2.gnd`, `padpic2.gnd`, `matchpic.gnd`, `anim.gnd`, `monitor.gnd`, `gndcove2.gnd`, `fax.gnd`
 
-It looks like certain `.gnd` files are decoded differently—dubious! In any case, since `sec2.gnd` appears in the secretary window, let’s apply the same trick and see if the rest of the files can be decoded when their contents are copied into `sec2.gnd`.
+It looks like certain `.gnd` files have display sizes! In any case, since `sec2.gnd` appears in the secretary window, let’s apply the same trick and see if the rest of the files can be decoded when their contents are copied into `sec2.gnd`.
 * **OK**:
 	`seas2.gnd`, `seas1.gnd`, `seas3.gnd`, `validpi2.gnd`, `sponsor1.gnd `, `sound.gnd`, `report.gnd`, `options2.gnd`, `gndpane2.gnd`, `gndside2.gnd`, `gndgoal2.gnd`, `tactic.gnd`, `namespic.gnd`
 * **OK (...But Odd Colors)**:
@@ -81,7 +81,7 @@ It looks like certain `.gnd` files are decoded differently—dubious! In any cas
 
 {{< figure src="/img/20250521-pm2_gnd/seas2.png" title="seas2.gnd used as sec2.gnd; background changed successfully" >}}
 
-I strongly suspect the odd colors are caused by decoding with a different palette. This is promising—there are two distinct decoding routines for the background images. One routine uses two palettes. All good!
+I strongly suspect the odd colors are caused by decoding with a different palette. This is promising, because there are two palette files in the game assets. All good!
 
 ## Entropy Analysis
 Using a hex editor, I took a quick peek at the `.gnd` files and, unlike the `.vga` files, they appear to be compressed. To confirm this, I measured the files’ entropy with a tool like [binwalk](https://github.com/ReFirmLabs/binwalk). Binwalk calculates Shannon entropy over fixed-size windows (1024 bytes each), giving a snapshot of how “random” each region is. An entropy of 0 bits/byte means all bytes are identical, whereas 8 bits/byte indicates perfectly random data. Higher entropy corresponds to higher information content. I like to think of it as how surprised you are by the next byte: if you see many consecutive identical bytes, each repeat is unsurprising—and thus low entropy.
@@ -99,7 +99,7 @@ Running the following commands will log the raw entropy data and generate entrop
 ```bash
 binwalk sponsors.vga --entropy --log sponsors2.txt
 binwalk sec2.gnd     --entropy --log sec2.txt
-````
+```
 
 In the images below, the Y-axis (0 – 8 bits/byte) shows the entropy for each 1024-byte block. `sponsors.vga` never exceeds about 3.5 bits/byte, whereas `sec2.gnd` sits around 6.3 bits/byte—implying a high degree of randomness and suggesting a pretty good compression mechanism.
 
@@ -119,9 +119,9 @@ python3 tools/printPalette.py ../assets/paldata.vga paldata_16.bmp --base 16
 {{< figure src="/img/20250521-pm2_gnd/paldata_16.bmp" title="Main game palette colors, extracted from paldata.vga" >}}
 
 ## First Steps
-I am still unsure what the format of this compressed file is, but juding from the time this game was made (~1992), I strongly suspect this compressed file is a either a custom variant of RLE or LZSS algorithm. Most likely is a combo of box, so I’ll use that as my starting point.
+I am still unsure what the format of this compressed file is, but judging from when this game was made (~1992), I strongly suspect the file uses a custom variant of RLE or LZSS. Most likely a combo of both, so I’ll use that as my starting point.
 
-To make my life easier, I’ll focus only on the smallest files that use the same compression scheme: `fax.gnd`, `gndcove2.gnd`, and `sponsor2.gnd`.
+To make my life easier, I’ll focus only on the smallest files that I can reliably read inside the game: `fax.gnd`, `gndcove2.gnd`, and `sponsor2.gnd`.
 
 Using a hex editor (e.g. HexFiend), I compare the first hundred or so bytes of each file, looking for patterns.  
 {{< figure src="/img/20250521-pm2_gnd/firstBytesComparison.png" title="Comparing the first bytes of each file" >}}
@@ -188,7 +188,7 @@ result.gnd
 phonpic2.gnd
 60 02 35 00
     -> 38x red(35)
-````
+```
 
 ### Small “Copy” Sequences
 
@@ -240,11 +240,11 @@ Replacing the entire file with a single opcode trio and you get predictable span
 | `60–7F`         | `xx vv`        | **RPT n×vv**                | `n = ((opcode & 0x1F)<<8) + xx + 36` <br> `repeat(vv, n)`   | Long repeat (≥ 36)                                             | 
 | `80–9F`         | `yy`           | **CPY2 off=d**              | `d = yy + 2` <br> `copy_back(d, 2)`                         | Copy 2 pixels from up to 257 bytes back                        | 
 | `A0–BF`         | `yy`           | **CPY3 off=d**              | `d = yy + 3` <br> `copy_back(d, 3)`                         | Copy 3 pixels from up to 258 bytes back                        | 
-| `C0–FF`         | `yy`           | **CPYk off=d**              | `d = offset + k` <br> `copy_back(d, k)`                     | General copy-back (length 4-19, distance ≥ length, max ≈ 1042) |
+| `C0–FF`         | `yy`           | **CPYk off=d**              | `d = offset + k` <br> `copy_back(d, k)` (The full pseudocode logic is too unwieldy to fit here, see python script for details) | General copy-back (length 4-19, distance ≥ length, max ≈ 1042) |
 
 <sup>* Mnemonic legend</sup>
-* **LIT N**    copy *N* literal bytes
-* **RPT m×vv**   repeat byte `vv` *m* times
+* **LIT N** copy *N* literal bytes
+* **RPT m×vv** repeat byte `vv` *m* times
 * **CPYk off=d** copy *k* bytes from `d` positions back in the output buffer
 
 ## The Decoder Script
@@ -290,29 +290,51 @@ Here is the main terminal window showing the decoding for each instruction, wher
 title="Live trace: frame #, file offset, raw bytes, and decoded meaning">}}
 
 ## Decoded Images
-Here are the results of running the decoding tool [`gndToBmp.py`](https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py), on the various images.
 
-{{< figure src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp" title="mainoff2.gnd" >}}
+Running all images through my script is simple. For example:
 
-{{< figure src="/img/20250521-pm2_gnd/result.gnd.bmp" title="result.gnd" >}}
+```bash
+for inp in ~/dosbox/pm2/*.gnd; do
+  base=$(basename "$inp")
+  python3 gndToBmp.py "$inp" ../assets/paldata.vga --scale 5 --out "${base}.bmp"
+done
+```
 
+Here are the results of running the decoding tool [`gndToBmp.py`](https://github.com/nunoalves/PM2_Legacy/blob/e74f7ac9e7a0db8c0031fc2341472a7e0d3e3cab/tools/gndToBmp.py) on all the `.gnd` images. The crashes reported above were indeed due to different image sizes (trying to print more data to the screen than the buffer allowed), not a different compression scheme.
+
+{{< figure src="/img/20250521-pm2_gnd/anim.gnd.bmp"     title="anim.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/contract.gnd.bmp" title="contract.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/credits.gnd.bmp"  title="credits.gnd" >}}
 {{< figure src="/img/20250521-pm2_gnd/diskpic2.gnd.bmp" title="diskpic2.gnd" >}}
-
-{{< figure src="/img/20250521-pm2_gnd/phonpic2.gnd.bmp" title="phonpic2.gnd" >}}
-
-{{< figure src="/img/20250521-pm2_gnd/padpic2.gnd.bmp" title="padpic2.gnd" >}}
-
-{{< figure src="/img/20250521-pm2_gnd/matchpic.gnd.bmp" title="matchpic.gnd" >}}
-
-{{< figure src="/img/20250521-pm2_gnd/anim.gnd.bmp" title="anim.gnd" >}}
-
-{{< figure src="/img/20250521-pm2_gnd/monitor.gnd.bmp" title="monitor.gnd" >}}
-
+{{< figure src="/img/20250521-pm2_gnd/fax.gnd.bmp"      title="fax.gnd" >}}
 {{< figure src="/img/20250521-pm2_gnd/gndcove2.gnd.bmp" title="gndcove2.gnd" >}}
-
+{{< figure src="/img/20250521-pm2_gnd/gndgoal2.gnd.bmp" title="gndgoal2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/gndpane2.gnd.bmp" title="gndpane2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/mainoff2.gnd.bmp" title="mainoff2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/matchpic.gnd.bmp" title="matchpic.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/monitor.gnd.bmp"  title="monitor.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/namespic.gnd.bmp" title="namespic.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/options2.gnd.bmp" title="options2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/padpic2.gnd.bmp"  title="padpic2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/phonpic2.gnd.bmp" title="phonpic2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/report.gnd.bmp"   title="report.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/result.gnd.bmp"   title="result.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/seas1.gnd.bmp"    title="seas1.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/seas2.gnd.bmp"    title="seas2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/seas3.gnd.bmp"    title="seas3.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/sec2.gnd.bmp"     title="sec2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/sound.gnd.bmp"    title="sound.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/sponsor1.gnd.bmp" title="sponsor1.gnd" >}}
 {{< figure src="/img/20250521-pm2_gnd/sponsor2.gnd.bmp" title="sponsor2.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/tactic.gnd.bmp"   title="tactic.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/titlepic.gnd.bmp" title="titlepic.gnd" >}}
+{{< figure src="/img/20250521-pm2_gnd/validpi2.gnd.bmp" title="validpi2.gnd" >}}
 
-{{< figure src="/img/20250521-pm2_gnd/fax.gnd.bmp" title="fax.gnd" >}}
+The files `credits.gnd`, `titlepic.gnd`, and `contract.gnd` appear to have been generated with a different palette. Let’s use the other palette file (`paltitle.vga`) included with the game files:
+
+{{< figure src="/img/20250521-pm2_gnd/credits_with_correct_palette.gnd.bmp"   title="credits.gnd with correct palette" >}}
+{{< figure src="/img/20250521-pm2_gnd/contract_with_correct_palette.gnd.bmp" title="contract.gnd with correct palette" >}}
+{{< figure src="/img/20250521-pm2_gnd/titlepic_with_correct_palette.gnd.bmp"  title="titlepic.gnd with correct palette" >}}
 
 ## Final Thoughts
-Figuring out a compression protocol without reverse-engineering the executable was actually a lot more fun than playing the game. The protocol itself feels tacked together. Also, different images apparently need a different decoding protocol (which I’ll check out another time). I’m a little confused why they made a custom RLE implementation with strange offsets, rather than using a canned LZSS implementation that’s been around since 1982 (or one of its later variants, like LZW). Anyway, it seems [others](https://moddingwiki.shikadi.net/wiki/RLE_Compression#Code) have done similar things, so it must be okay. Maybe in one of my next posts I’ll compare this with other early-1990s compression schemes—to see what the Premier Manager 2 team were drinking :)
+Figuring out a compression protocol without reverse-engineering the executable was actually a lot more fun than playing the game. The protocol itself feels tacked together. I’m a little confused why they made a custom RLE implementation with strange offsets, rather than using a canned LZSS implementation that’s been around since 1982 (or one of its later variants, like LZW). Anyway, it seems [others](https://moddingwiki.shikadi.net/wiki/RLE_Compression#Code) have done similar things, so it must be okay. Maybe in one of my next posts I’ll compare this with other early-1990s compression schemes—to see what the Premier Manager 2 team were drinking :)
