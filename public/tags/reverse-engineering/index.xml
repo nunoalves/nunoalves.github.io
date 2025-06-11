@@ -13,7 +13,7 @@
       <link>http://localhost:1313/posts/pm2-image-extraction-part-2/</link>
       <pubDate>Wed, 21 May 2025 23:02:19 -0400</pubDate>
       <guid>http://localhost:1313/posts/pm2-image-extraction-part-2/</guid>
-      <description>&lt;p&gt;So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (&lt;code&gt;.gnd&lt;/code&gt;) files. A year or so ago, I worked on the &lt;code&gt;.vga&lt;/code&gt; files, so now it’s time to try decoding the &lt;code&gt;.gnd&lt;/code&gt; files. I haven’t touched this in a while, so I’m not sure how far I got last time. Honestly figuring these type of thigns is lot more fun that playing the game. Without further ado, let’s start!&lt;/p&gt;</description>
+      <description>&lt;p&gt;So! This is it. After slacking off for a while, I think I’m ready to reverse engineer the Premier Manager 2 (PM2) image compression format for the background (&lt;code&gt;.gnd&lt;/code&gt;) files. A year or so ago, I worked on the &lt;code&gt;.vga&lt;/code&gt; files, so now it’s time to try decoding the &lt;code&gt;.gnd&lt;/code&gt; files. I haven’t touched this in a while, so I’m not sure how far I got last time. Without further ado, let’s start!&lt;/p&gt;</description>
     </item>
     <item>
       <title>Reverse-Engineering Premier Manager 2’s VGA Graphics</title>

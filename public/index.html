@@ -9,8 +9,8 @@
 	<meta name="description" content="">
 		
   <meta itemprop="name" content="ohNoNuNo">
-  <meta itemprop="datePublished" content="2025-05-21T23:02:19-04:00">
-  <meta itemprop="dateModified" content="2025-05-21T23:02:19-04:00">
+  <meta itemprop="datePublished" content="2025-06-11T08:55:22-04:00">
+  <meta itemprop="dateModified" content="2025-06-11T08:55:22-04:00">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
 	<link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -46,6 +46,27 @@
 			
 <main class="main list" role="main">
 	<article class="list__item post">
+	
+	<figure class="list__thumbnail thumbnail">
+		<a class="thumbnail__link" href="/posts/installing-freedos-1.4/">
+		<img class="thumbnail__image" src="/img/20250611-freedos/gopher.png" alt="Installing Freedos 1.4 on Ubuntu 24.04">
+		</a>
+	</figure>
+	<header class="list__header">
+		<h2 class="list__title post__title">
+			<a href="/posts/installing-freedos-1.4/" rel="bookmark">
+			Installing Freedos 1.4 on Ubuntu 24.04
+			</a>
+		</h2>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 1 1 0 28 1 1 0 0 1 0-28m0 3a3 3 0 1 0 0 22 3 3 0 0 0 0-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class="meta__text" datetime="2025-06-11T08:55:22-04:00">June 11, 2025</time></div></div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		<p>About a week ago, I came across <a href="https://hackaday.com/2025/05/29/bring-back-the-bios-to-uefi-systems-that-is/">this Hackaday post</a> about a <a href="https://github.com/FlyGoat/csmwrap">UEFI-wrapper project</a> that re-enables legacy BIOS on UEFI-only systems. Coincidentally, <a href="https://freedos.org">FreeDOS v1.4</a> was just released, so I decided to repurpose an old laptop as a pure FreeDOS machine. Because DOS requires a BIOS runtime (no native UEFI support), most modern machines can’t run it natively.</p>
+<p>I tried CSMwrap on my janky laptop, but things didn’t quite work. Since I mainly wanted to try FreeDOS rather than dive into a UEFI rabbit hole, I opted to run FreeDOS inside QEMU on Ubuntu 24.04 LTS. Below are the exact steps—including FAT16 partitioning, QEMU command-line options, and networking tweaks&hellip; Mainly, so I won’t forget what I did.</p>
+	</div>
+</article><article class="list__item post">
 	
 	<figure class="list__thumbnail thumbnail">
 		<a class="thumbnail__link" href="/posts/pm2-image-extraction-part-2/">
@@ -128,6 +149,7 @@
 	<h4 class="widget__title">Recent Posts</h4>
 	<div class="widget__content">
 		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/posts/installing-freedos-1.4/">Installing Freedos 1.4 on Ubuntu 24.04</a></li>
 			<li class="widget__item"><a class="widget__link" href="/posts/pm2-image-extraction-part-2/">Decoding and Decompressing PM2’s Background Images</a></li>
 			<li class="widget__item"><a class="widget__link" href="/posts/ai-jetpac-part-1/">AI Jetpac, Part 1</a></li>
 			<li class="widget__item"><a class="widget__link" href="/posts/pm2-image-extraction-part-1/">Reverse-Engineering Premier Manager 2’s VGA Graphics</a></li>

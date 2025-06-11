@@ -6,8 +6,15 @@
     <description>Recent content on ohNoNuNo</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 21 May 2025 23:02:19 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 11 Jun 2025 08:55:22 -0400</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Installing Freedos 1.4 on Ubuntu 24.04</title>
+      <link>http://localhost:1313/posts/installing-freedos-1.4/</link>
+      <pubDate>Wed, 11 Jun 2025 08:55:22 -0400</pubDate>
+      <guid>http://localhost:1313/posts/installing-freedos-1.4/</guid>
+      <description>&lt;p&gt;About a week ago, I came across &lt;a href=&#34;https://hackaday.com/2025/05/29/bring-back-the-bios-to-uefi-systems-that-is/&#34;&gt;this Hackaday post&lt;/a&gt; about a &lt;a href=&#34;https://github.com/FlyGoat/csmwrap&#34;&gt;UEFI-wrapper project&lt;/a&gt; that re-enables legacy BIOS on UEFI-only systems. Coincidentally, &lt;a href=&#34;https://freedos.org&#34;&gt;FreeDOS v1.4&lt;/a&gt; was just released, so I decided to repurpose an old laptop as a pure FreeDOS machine. Because DOS requires a BIOS runtime (no native UEFI support), most modern machines can’t run it natively.&lt;/p&gt;&#xA;&lt;p&gt;I tried CSMwrap on my janky laptop, but things didn’t quite work. Since I mainly wanted to try FreeDOS rather than dive into a UEFI rabbit hole, I opted to run FreeDOS inside QEMU on Ubuntu 24.04 LTS. Below are the exact steps—including FAT16 partitioning, QEMU command-line options, and networking tweaks&amp;hellip; Mainly, so I won’t forget what I did.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Decoding and Decompressing PM2’s Background Images</title>
       <link>http://localhost:1313/posts/pm2-image-extraction-part-2/</link>
