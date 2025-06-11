@@ -63,8 +63,8 @@ qemu-system-x86_64 --version
 qemu-img create -f raw ~/freedos16.img 1536M
 ```
 
-* `-f raw` → raw disk image
-* `1536M` → 1.5 GB (well under FAT16’s 2 GB limit)
+* `-f raw` : raw disk image
+* `1536M` : 1.5 GB (well under FAT16’s 2 GB limit)
 
 ---
 
