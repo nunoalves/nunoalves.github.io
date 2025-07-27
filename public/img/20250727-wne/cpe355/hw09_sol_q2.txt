@@ -1,0 +1,19 @@
+#define DISP_BUFFER 0xB8000
+int row, col;
+char disp_char;
+char *p;
+byte *color;
+
+// Let’s display "A" in row 4, col 20 
+disp_char = ’A’;
+row = 4;   // for example ... 
+col = 20;  //
+p = (char *) (DISP_BUFFER + 2 *(80*row + col))
+
+// Let’s make sure the color is black
+disp_color ='black';
+color = (byte *) (DISP_BUFFER + 2 *(80*row + col)) + 1
+
+//now lets write the character and the color information
+*p = disp_char;
+*color = disp_color

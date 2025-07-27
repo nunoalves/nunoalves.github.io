@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Computer Architecture Classes @ WNE - ohNoNuNo</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+		
+  <meta itemprop="name" content="Computer Architecture Classes @ WNE">
+  <meta itemprop="description" content="Many, many, many years ago, I took a small career detour and taught for one year at a regional college in MA. There, I was assigned to teach several introductory computer engineering courses. On this page, I’m sharing the slides from the most memorable ones: real-time kernels (a fancy term for embedded RTOS), VHDL simulation and synthesis, and an electronics summer camp for 8–12-year-olds. The other classes were more prosaic. In a fun twist, almost 15 years later I’m once again working with VHDL. Since my slides were all tucked away on a hard-disk drive, I figured—why not take this opportunity to put everything online for posterity? Enjoy!">
+  <meta itemprop="datePublished" content="2025-07-27T10:32:17-04:00">
+  <meta itemprop="dateModified" content="2025-07-27T10:32:17-04:00">
+  <meta itemprop="wordCount" content="691">
+  <meta itemprop="keywords" content="VHDL,Embedded Systems">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+
+	<link rel="stylesheet" href="/css/style.css">
+	
+
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container header__container">
+		
+	<div class="logo logo--mixed">
+		<a class="logo__link" href="/" title="ohNoNuNo" rel="home">
+			<div class="logo__item logo__imagebox">
+					<img class="logo__img" src="/img/floating_city-John_Harris.jpg">
+				</div><div class="logo__item logo__text">
+					<div class="logo__title">ohNoNuNo</div>
+					
+				</div>
+		</a>
+	</div>
+		<div class="divider"></div>
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Computer Architecture Classes @ WNE</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 1 1 0 28 1 1 0 0 1 0-28m0 3a3 3 0 1 0 0 22 3 3 0 0 0 0-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class="meta__text" datetime="2025-07-27T10:32:17-04:00">July 27, 2025</time></div></div>
+		</header>
+		
+	<figure class="post__thumbnail thumbnail">
+		
+		<img class="thumbnail__image" src="/img/20250727-wne/clogo.png" alt="Computer Architecture Classes @ WNE">
+		
+	</figure>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+  <ul>
+    <li><a href="#cpe-462--vhdl-simulation-and-synthesis--fall-11">CPE 462 – VHDL: Simulation and Synthesis – Fall ’11</a>
+      <ul>
+        <li><a href="#topic-1-introduction-to-reconfigurable-computing">Topic 1: Introduction to reconfigurable computing</a></li>
+        <li><a href="#topic-2-review">Topic 2: Review</a></li>
+        <li><a href="#topic-3-introducing-simulation-and-prototype-tools">Topic 3: Introducing Simulation and Prototype Tools</a></li>
+        <li><a href="#topic-4-vhdl-foundations">Topic 4: VHDL Foundations</a></li>
+        <li><a href="#topic-5-concurrent-code">Topic 5: Concurrent Code</a></li>
+        <li><a href="#topic-6-sequential-code">Topic 6: Sequential Code</a></li>
+        <li><a href="#topic-7-finite-state-machines-fsm">Topic 7: Finite State Machines (FSM)</a></li>
+        <li><a href="#topic-8-system-design">Topic 8: System Design</a></li>
+        <li><a href="#topic-9-circuit-designs">Topic 9: Circuit Designs</a></li>
+        <li><a href="#homework">Homework</a></li>
+        <li><a href="#exams">Exams</a></li>
+      </ul>
+    </li>
+    <li><a href="#cpe-355--real-time-embedded-kernels--spring-12">CPE 355 – Real Time Embedded Kernels – Spring ’12</a>
+      <ul>
+        <li><a href="#topic-1-background">Topic 1: Background</a></li>
+        <li><a href="#topic-2-programming-foundations-arduino--c">Topic 2: Programming foundations (Arduino &amp; C)</a></li>
+        <li><a href="#topic-3-foundations-of-real-time-systems">Topic 3: Foundations of real-time systems</a></li>
+        <li><a href="#topic-4-features-of-real-time-operating-systems">Topic 4: Features of real-time operating systems</a></li>
+        <li><a href="#homework-1">Homework</a></li>
+        <li><a href="#exams-1">Exams</a></li>
+      </ul>
+    </li>
+    <li><a href="#electronics-summer-camp-ages-812">Electronics Summer Camp (Ages 8–12)</a></li>
+  </ul>
+</nav>
+	</div>
+</div><div class="content post__content clearfix">
+			<p>Many, many, many years ago, I took a small career detour and taught for one year at a regional college in MA. There, I was assigned to teach several introductory computer engineering courses. On this page, I’m sharing the slides from the most memorable ones: real-time kernels (a fancy term for embedded RTOS), VHDL simulation and synthesis, and an electronics summer camp for 8–12-year-olds. The other classes were more prosaic. In a fun twist, almost 15 years later I’m once again working with VHDL. Since my slides were all tucked away on a hard-disk drive, I figured—why not take this opportunity to put everything online for posterity? Enjoy!</p>
+<hr>
+<h2 id="cpe-462--vhdl-simulation-and-synthesis--fall-11">CPE 462 – VHDL: Simulation and Synthesis – Fall ’11</h2>
+<p>Syllabus <a href="/img/20250727-wne/cpe462/fall_2011_cpe462_syllabus.pdf">PDF</a></p>
+<h3 id="topic-1-introduction-to-reconfigurable-computing">Topic 1: Introduction to reconfigurable computing</h3>
+<ul>
+<li>Introduction <a href="/img/20250727-wne/cpe462/topic-01.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-2-review">Topic 2: Review</h3>
+<ul>
+<li>a) Review of Combinational Logic <a href="/img/20250727-wne/cpe462/topic-02a.pdf">PDF</a></li>
+<li>b) Review of Sequential Logic <a href="/img/20250727-wne/cpe462/topic-02b.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-3-introducing-simulation-and-prototype-tools">Topic 3: Introducing Simulation and Prototype Tools</h3>
+<ul>
+<li>a) Introduction to VHDL <a href="/img/20250727-wne/cpe462/topic-03a.pdf">Slides PDF</a> Source code: <a href="/img/20250727-wne/cpe462/topic3a-nand.zip">nand gate</a>, <a href="/img/20250727-wne/cpe462/topic3a-DFF.zip">d-flip-flop</a>, <a href="/img/20250727-wne/cpe462/topic3a-n_dff.zip">nand + d-flip-flop</a></li>
+<li>b) Xilinx Development Environment <a href="/img/20250727-wne/cpe462/topic-03b.pdf">Slides PDF</a> <a href="/img/20250727-wne/cpe462/topic-03b-practice.pdf">Practice Solutions</a></li>
+<li>c) Aldec Active HDL Environment <a href="/img/20250727-wne/cpe462/topic-03c.pdf">Slides PDF</a> <a href="/img/20250727-wne/cpe462/topic-03c-practice.pdf">Practice Solutions</a> Source code: <a href="/img/20250727-wne/cpe462/topic3c-ex1.zip">Practice #1: DFF + nand</a>, <a href="/img/20250727-wne/cpe462/topic3c-ex2.zip">Practice #2: SR latch</a></li>
+<li>d) Test-Benches <a href="/img/20250727-wne/cpe462/topic-03d.pdf">Slides PDF</a> <a href="/img/20250727-wne/cpe462/topic-03d-practice.pdf">Practice Solutions</a> <a href="/img/20250727-wne/cpe462/test-bench-template.txt">Template</a> Source code: <a href="/img/20250727-wne/cpe462/topic3d-4to1_testbench.zip">4-to-1 MUX</a>, <a href="/img/20250727-wne/cpe462/topic3d-ex1.zip">Practice #1</a>, <a href="/img/20250727-wne/cpe462/topic3d-ex2.zip">Practice #2</a></li>
+</ul>
+<h3 id="topic-4-vhdl-foundations">Topic 4: VHDL Foundations</h3>
+<ul>
+<li>a) Basic Synthesizable Data Types <a href="/img/20250727-wne/cpe462/topic-04a.pdf">PDF</a> <a href="/img/20250727-wne/cpe462/topic-04a-practice.pdf">Practice Solutions</a></li>
+<li>b) Types and Arrays <a href="/img/20250727-wne/cpe462/topic-04b.pdf">PDF</a> <a href="/img/20250727-wne/cpe462/topic4b-ex4.txt">Exercise #4 Test-Bench</a>, <a href="/img/20250727-wne/cpe462/topic4b-ex5.txt">Exercise #5 Test-Bench</a> <a href="/img/20250727-wne/cpe462/topic-04b-practice.pdf">Practice Solutions</a></li>
+<li>c) Operators and Attributes <a href="/img/20250727-wne/cpe462/topic-04c.pdf">PDF</a></li>
+<li>d) Generics <a href="/img/20250727-wne/cpe462/topic-04d.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-5-concurrent-code">Topic 5: Concurrent Code</h3>
+<ul>
+<li>a) WHEN Statements <a href="/img/20250727-wne/cpe462/topic-05a.pdf">PDF</a></li>
+<li>b) GENERATE Statements <a href="/img/20250727-wne/cpe462/topic-05b.pdf">PDF</a></li>
+<li>c) BLOCK Statements <a href="/img/20250727-wne/cpe462/topic-05c.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-6-sequential-code">Topic 6: Sequential Code</h3>
+<ul>
+<li>a) Process, If, and Variables <a href="/img/20250727-wne/cpe462/topic-06a.pdf">PDF</a></li>
+<li>b) Sequential Code on Spartan-3 Boards <a href="/img/20250727-wne/cpe462/topic-06b.pdf">PDF</a></li>
+<li>c) Wait, Case, and Loop <a href="/img/20250727-wne/cpe462/topic-06c.pdf">PDF</a></li>
+<li>d) Final Topics in Sequential Code <a href="/img/20250727-wne/cpe462/topic-06d.pdf">PDF</a></li>
+<li>e) Variables vs Signals <a href="/img/20250727-wne/cpe462/topic-06e.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-7-finite-state-machines-fsm">Topic 7: Finite State Machines (FSM)</h3>
+<ul>
+<li>a) Introduction to Finite State Machines <a href="/img/20250727-wne/cpe462/topic-07a.pdf">PDF</a></li>
+<li>b) Practical VHDL Implementations <a href="/img/20250727-wne/cpe462/topic-07b.pdf">PDF</a></li>
+<li>c) FSM on Spartan-3E <a href="/img/20250727-wne/cpe462/topic-07c.pdf">PDF</a></li>
+<li>d) FSM with Delays <a href="/img/20250727-wne/cpe462/topic-07d.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-8-system-design">Topic 8: System Design</h3>
+<ul>
+<li>a) Components <a href="/img/20250727-wne/cpe462/topic-08a.pdf">PDF</a></li>
+<li>b) Packages &amp; Generic Components <a href="/img/20250727-wne/cpe462/topic-08b.pdf">PDF</a></li>
+<li>c) Functions <a href="/img/20250727-wne/cpe462/topic-08c.pdf">PDF</a></li>
+<li>d) Procedures <a href="/img/20250727-wne/cpe462/topic-08d.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-9-circuit-designs">Topic 9: Circuit Designs</h3>
+<ul>
+<li>a) Introduction to Random Numbers in Hardware <a href="/img/20250727-wne/cpe462/topic-09a.pdf">PDF</a></li>
+</ul>
+<h3 id="homework">Homework</h3>
+<ul>
+<li><a href="/img/20250727-wne/cpe462/hw/hw01.pdf">HW #1</a> <a href="/img/20250727-wne/cpe462/hw/hw01-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw02.pdf">HW #2</a> <a href="/img/20250727-wne/cpe462/hw/hw02-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw03.pdf">HW #3</a> <a href="/img/20250727-wne/cpe462/hw/hw03_ex3-testbench.vhd">exercise #3 testbench</a> <a href="/img/20250727-wne/cpe462/hw/hw03-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw04.pdf">HW #4</a> <a href="/img/20250727-wne/cpe462/hw/hw04-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw05.pdf">HW #5</a> <a href="/img/examples/topic4b-ex4.txt">exercise #3 testbench</a> <a href="/img/examples/topic4b-ex5.txt">exercise #4 testbench</a> <a href="/img/20250727-wne/cpe462/hw/hw05-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw06.pdf">HW #6</a> <a href="/img/20250727-wne/cpe462/hw/hw06-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw07.pdf">HW #7</a> <a href="/img/20250727-wne/cpe462/hw/hw07-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw08.pdf">HW #8</a> <a href="/img/20250727-wne/cpe462/hw/hw08-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw09.pdf">HW #9</a> <a href="/img/20250727-wne/cpe462/hw/hw09-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/exam_01.pdf">EXAM #1 &amp; HW #10</a> <a href="/img/20250727-wne/cpe462/hw/exam1_testbench_1.txt">testbench</a> <a href="/img/slides/exam_01_comments.pdf">comments</a> <a href="/img/20250727-wne/cpe462/hw/exam_01_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw11.pdf">HW #11</a> <a href="/img/20250727-wne/cpe462/hw/hw11-testbench.txt">testbench</a> <a href="/img/20250727-wne/cpe462/hw/hw11-waveform.png">waveform</a> <a href="/img/20250727-wne/cpe462/hw/hw11-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw12.pdf">HW #12</a> <a href="/img/20250727-wne/cpe462/hw/hw12-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw13.pdf">HW #13</a> <a href="/img/20250727-wne/cpe462/hw/hw13-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw14.pdf">HW #14</a> <a href="/img/20250727-wne/cpe462/hw/hw14-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw15.pdf">HW #15</a> <a href="/img/20250727-wne/cpe462/hw/hw15-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw16.pdf">HW #16</a> <a href="/img/20250727-wne/cpe462/hw/exam_02_sol.txt">partial solution</a> <a href="/img/20250727-wne/cpe462/hw/hw16-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw17.pdf">HW #17</a> <a href="/img/20250727-wne/cpe462/hw/exam_01_sol.pdf">partial solution</a> <a href="/img/20250727-wne/cpe462/hw/hw17-sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/hw18.pdf">HW #18</a> <a href="/img/20250727-wne/cpe462/hw/hw18-sol.pdf">solutions</a></li>
+</ul>
+<h3 id="exams">Exams</h3>
+<ul>
+<li><a href="/img/20250727-wne/cpe462/hw/exam_01.pdf">Exam #1</a> <a href="/img/20250727-wne/cpe462/hw/exam_01_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/exam_02.pdf">Exam #2</a> <a href="/img/20250727-wne/cpe462/hw/exam_02_sol.txt">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe462/hw/exam_03.pdf">Final Exam</a> <a href="/img/20250727-wne/cpe462/hw/turn_in.png">turn-in times</a> <a href="/img/20250727-wne/cpe462/hw/exam_03_sol.pdf">solutions</a></li>
+</ul>
+<hr>
+<h2 id="cpe-355--real-time-embedded-kernels--spring-12">CPE 355 – Real Time Embedded Kernels – Spring ’12</h2>
+<p>Syllabus <a href="/img/20250727-wne/cpe355/spring_2012_cpe355_syllabus.pdf">PDF</a></p>
+<h3 id="topic-1-background">Topic 1: Background</h3>
+<ul>
+<li>a) Digital logic and information representation review <a href="/img/20250727-wne/cpe355/cpe355-01-a.pdf">PDF</a></li>
+<li>b) Hardware fundamentals for the software engineer <a href="/img/20250727-wne/cpe355/cpe355-01-b.pdf">PDF</a></li>
+<li>c) Advanced hardware fundamentals <a href="/img/20250727-wne/cpe355/cpe355-01-c.pdf">PDF</a></li>
+<li>d) Introduction to interrupts <a href="/img/20250727-wne/cpe355/cpe355-01-d.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-2-programming-foundations-arduino--c">Topic 2: Programming foundations (Arduino &amp; C)</h3>
+<ul>
+<li>a) Arduino and basic C review <a href="/img/20250727-wne/cpe355/cpe355-02-a.pdf">PDF</a></li>
+<li>b) Interrupts in Arduino <a href="/img/20250727-wne/cpe355/cpe355-02-b.pdf">PDF</a></li>
+<li>c) Pointers, arrays and function pointers <a href="/img/20250727-wne/cpe355/cpe355-02-c.pdf">PDF</a></li>
+<li>d) Structs, linked lists, stacks and queues <a href="/img/20250727-wne/cpe355/cpe355-02-d.pdf">PDF</a> <a href="/img/20250727-wne/cpe355/linked_list.c">source</a></li>
+<li>e) Bitwise operators, macros and enumeration <a href="/img/20250727-wne/cpe355/cpe355-02-e.pdf">PDF</a></li>
+<li>f) Very basic introduction to Arduino timers <a href="/img/20250727-wne/cpe355/cpe355-02-f.pdf">PDF</a></li>
+<li>g) Literal constants, extern, typedef, callback functions and macros <a href="/img/20250727-wne/cpe355/cpe355-02-g.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-3-foundations-of-real-time-systems">Topic 3: Foundations of real-time systems</h3>
+<ul>
+<li>a) Survey of software architectures: round-robin <a href="/img/20250727-wne/cpe355/cpe355-03-a.pdf">PDF</a></li>
+<li>b) Survey of software architectures: queues and RTOS <a href="/img/20250727-wne/cpe355/cpe355-03-b.pdf">PDF</a></li>
+</ul>
+<h3 id="topic-4-features-of-real-time-operating-systems">Topic 4: Features of real-time operating systems</h3>
+<ul>
+<li>a) Tasks, task data and reentrant functions <a href="/img/20250727-wne/cpe355/cpe355-04-a.pdf">PDF</a></li>
+<li>b) Semaphores and shared data <a href="/img/20250727-wne/cpe355/cpe355-04-b.pdf">PDF</a></li>
+<li>c) Message queues, mailboxes and pipes <a href="/img/20250727-wne/cpe355/cpe355-04-c.pdf">PDF</a></li>
+<li>d) Timer functions <a href="/img/20250727-wne/cpe355/cpe355-04-d.pdf">PDF</a></li>
+<li>e) Events and memory management <a href="/img/20250727-wne/cpe355/cpe355-04-e.pdf">PDF</a></li>
+<li>f) Basic design using a real-time operating system <a href="/img/20250727-wne/cpe355/cpe355-04-f.pdf">PDF</a></li>
+</ul>
+<h3 id="homework-1">Homework</h3>
+<ul>
+<li><a href="/img/20250727-wne/cpe355/hw01.pdf">HW01</a> <a href="/img/20250727-wne/cpe355/hw01_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw02.pdf">HW02</a> <a href="/img/20250727-wne/cpe355/hw02_sol.pdf">solutions by Alexandra Carter</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw03.pdf">HW03</a> <a href="/img/20250727-wne/cpe355/hw03_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw04.pdf">HW04</a> <a href="/img/20250727-wne/cpe355/hw04_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw05.pdf">HW05</a> <a href="/img/20250727-wne/cpe355/hw05_sol.zip">solutions by William Ferguson</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw06.pdf">HW06</a> <a href="/img/20250727-wne/cpe355/hw06_sol.ino">solutions by Scott Nette</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw07.pdf">HW07</a> <a href="/img/20250727-wne/cpe355/hw07_sol.zip">solutions by Kyle Hunter</a> <a href="/img/20250727-wne/cpe355/hw07_errata.txt">errata</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw08.pdf">HW08</a> <a href="/img/20250727-wne/cpe355/hw08_sol.zip">solutions by William Ferguson</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw09.pdf">HW09</a> <a href="/img/20250727-wne/cpe355/hw09_sol_q1.ino">q1 solution by Jason T. John</a> <a href="/img/20250727-wne/cpe355/hw09_sol_q2.txt">q2 solution</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw10.pdf">HW10</a> <a href="/img/20250727-wne/cpe355/hw10_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw11.pdf">HW11</a> <a href="/img/20250727-wne/cpe355/hw11_sol.txt">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw12.pdf">HW12</a> <a href="/img/20250727-wne/cpe355/hw12_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw13.pdf">HW13</a> <a href="/img/20250727-wne/cpe355/hw13_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw14-15.pdf">HW14 &amp; 15</a> <a href="/img/20250727-wne/cpe355/hw14-15_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw16.pdf">HW16</a> <a href="/img/20250727-wne/cpe355/hw16_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/hw17.pdf">HW17</a> <a href="/img/20250727-wne/cpe355/hw17_sol.pdf">solutions</a></li>
+</ul>
+<h3 id="exams-1">Exams</h3>
+<ul>
+<li><a href="/img/20250727-wne/cpe355/midterm_01.pdf">Exam #01</a> <a href="/img/20250727-wne/cpe355/midterm_01_sol.pdf">solutions</a></li>
+<li><a href="/img/20250727-wne/cpe355/midterm_02.pdf">Exam #02</a> <a href="/img/20250727-wne/cpe355/midterm_02_solutions.pdf">solutions</a></li>
+</ul>
+<h2 id="electronics-summer-camp-ages-812">Electronics Summer Camp (Ages 8–12)</h2>
+<ul>
+<li>Hackerspace <a href="/img/20250727-wne/summer_camp_2012/hackerspace.pdf">PDF</a></li>
+<li>Day 1 <a href="/img/20250727-wne/summer_camp_2012day_01.pdf">PDF</a></li>
+<li>Day 2 <a href="/img/20250727-wne/summer_camp_2012/day_02.pdf">PDF</a></li>
+<li>Day 3 <a href="/img/20250727-wne/summer_camp_2012/day_03.pdf">PDF</a></li>
+<li>Day 4 <a href="/img/20250727-wne/summer_camp_2012/day_04.pdf">PDF</a></li>
+</ul>
+
+		</div>
+		<footer class="post__footer">
+			
+<div class="post__tags tags clearfix">
+	<svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M4 0h8s2 0 4 2l15 15s2 2 0 4L21 31s-2 2-4 0L2 16s-2-2-2-4V3s0-3 4-3m3 10a3 3 0 0 0 0-6 3 3 0 0 0 0 6"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/vhdl/" rel="tag">VHDL</a>
+		</li>
+		<li class="tags__item">
+			<a class="tags__link btn" href="/tags/embedded-systems/" rel="tag">Embedded Systems</a>
+		</li>
+	</ul>
+</div>
+		</footer>
+	</article>
+</main>
+
+
+
+
+			</div>
+			
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2025 ohNoNuNo.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script>
+</body>
+</html>

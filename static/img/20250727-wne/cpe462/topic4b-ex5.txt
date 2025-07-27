@@ -1,0 +1,31 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+-- extra package included
+USE ieee.std_logic_unsigned.all;
+
+entity test_parity_decoder is
+end;
+
+architecture bench of test_parity_decoder is
+  component parity_decoder
+	port (input_bus  : in std_logic_vector(4 downto 0);
+		  parity_outcome : out std_logic
+	);	
+  end component;
+
+  signal input_bus : std_logic_vector(4 downto 0);
+  signal parity_outcome : std_logic;
+  
+begin   
+ input_bus  <= "00000", -- even (correct parity)
+ "00001" after 10 ns, -- odd (incorrect parity)
+ "10010" after 20 ns, -- odd (correct parity)
+ "00011" after 30 ns, -- even (correct parity)
+ "10100" after 40 ns, -- odd (correct parity)
+ "00101" after 50 ns, -- even (correct parity)
+ "10110" after 60 ns, -- even  (incorrect parity)
+ "00111" after 70 ns; -- odd  (incorrect parity)
+ 
+    m: parity_decoder port map (input_bus, parity_outcome);
+
+end bench;

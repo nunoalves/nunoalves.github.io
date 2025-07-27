@@ -1,0 +1,23 @@
+entity <<TEST-BENCH NAME>> is
+end;
+
+architecture bench of <<TEST-BENCH NAME>> is
+  component <<ENTITY NAME TO BE TESTED>>
+
+    	<<COPY IN/OUT PORT NAMES>>
+
+  end component;
+
+  signal <<INSERT IN/OUT PORT NAMES & SIGNAL TYPES>>;
+
+begin   
+ <<INPUT #1 NAME>>  <= '0', '1' after 20 ns;
+ <<INPUT #2 NAME>>  <= '0', '1' after 10ns;
+ <<INPUT #3 NAME>>  <= '0', '1' after 5 ns;
+ <<INPUT #4 NAME>>  <= '0', '1' after 20 ns, '0' after 30 ns;
+ <<INPUT #5 NAME>>  <= '0', '1' after 10 ns, '0' after 20 ns;
+ <<INPUT #6 NAME>>  <= '0', '1' after 15 ns, '1' after 25 ns;
+
+    m: <<ENTITY NAME TO BE TESTED>> port map (INSERT IN/OUT PORT NAMES);
+
+end bench;

@@ -1,0 +1,46 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity test_question1 is
+end;
+
+architecture bench of test_question1 is
+  component question1
+	port (a : in  std_logic_vector(3 downto 0);
+		  s : in  std_logic_vector (2 downto 0);
+		  f : out std_logic_vector (3 downto 0)
+	);
+  end component;
+
+  signal a : std_logic_vector (3 downto 0);	  
+  signal s : std_logic_vector (2 downto 0);	  
+  signal f : std_logic_vector (3 downto 0);
+
+begin   
+ a   <= "1010", 	--f=0101
+ "1111" after 10ns, --f=1100
+ "ZZZZ" after 20ns,	--f=ZZZZ
+ "1Z0X" after 30ns,	--f=X0Z1
+ 
+ "0011" after 40ns,	-- f=0100
+ "0000" after 50ns, -- f=1111 
+ "1000" after 60ns, -- f=1010
+ "XXXX" after 70ns; -- f=ZZZZ 
+ 
+ 
+ s   <= 
+ "000",  			-- f=a shift right 
+ "001" after 10ns,  -- f=a shift left 2 units 
+ "010" after 20ns, 	-- f=a unchanged
+ "011" after 30ns,  -- f=a reverse bits
+ "100" after 40ns,	-- f=a+1
+ "101" after 50ns,  -- f=a-1 
+ "110" after 60ns, 	-- f=a+2
+ "111" after 70ns;  -- f=ZZZZ 
+ m: question1 port map (a,s,f);
+
+end bench;
+
+
+
+

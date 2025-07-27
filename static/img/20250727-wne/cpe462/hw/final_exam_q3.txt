@@ -1,0 +1,40 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+USE work.traffic_light_package.all;
+
+entity testbench01 is
+end;
+
+architecture bench of testbench01 is
+	component traffic_controller is
+		port (reset, clk_1hz : in std_logic;
+		SRD_sensor : in	std_logic;
+		pedestrian_sensor : in std_logic;
+		HWY_light, SRD_light : out color
+		);
+	end component;
+
+  signal clk_1hz, SRD_sensor, pedestrian_sensor, reset : STD_LOGIC := '0';
+  signal HWY_light,SRD_light : color; 
+
+begin 
+  process
+  begin
+    for i in 1 to 2 loop
+      clk_1hz <= not clk_1hz;
+      wait for 500 ms;
+      clk_1hz <= not clk_1hz;
+      wait for 500 ms;
+    end loop;
+  end process;
+
+  reset<= '0','1' after 500ms,'0' after 1000ms;
+  SRD_sensor <= '0', '1' after 70000ms, '0' after 81000ms,	'1' after 170000ms;
+  pedestrian_sensor <= '0',
+  	'1' after 100000ms, '0' after 110000ms,
+  	'1' after 150000ms, '0' after 160000ms;
+	  
+m: traffic_controller port map (reset, clk_1hz,SRD_sensor,pedestrian_sensor, HWY_light, SRD_light);
+
+end bench;

@@ -1,0 +1,38 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+
+entity testbench01 is
+end;
+
+architecture bench of testbench01 is
+  component timerCircuit
+	PORT (clk_2hz, start_stop,reset : IN STD_LOGIC;
+		min, sec1, sec2 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)); 
+  end component;
+
+  signal clk_2hz, start_stop,reset : STD_LOGIC := '0';
+  signal min, sec1, sec2 : STD_LOGIC_VECTOR (6 DOWNTO 0); 
+
+begin 
+  process
+  begin
+    for i in 1 to 2 loop
+      clk_2hz <= not clk_2hz;
+      wait for 250 ms;
+      clk_2hz <= not clk_2hz;
+      wait for 250 ms;
+    end loop;
+  end process;
+	
+ start_stop   <= '0', '1' after 3000ms, '0' after 4000ms,
+ '1' after 6000ms, '0' after 7000ms, 
+ '1' after 9000ms, '0' after 10000ms, 
+ '1' after 12000ms, '0' after 13000ms,
+ '1' after 15000ms, '0' after 16000ms;
+ 
+ reset   	  <= '0', '1' after 1000ms, '0' after 2000ms, '1' after 14000ms,'0' after 15000ms;  
+ 
+ m: timerCircuit port map (clk_2hz,start_stop,reset,min, sec1, sec2);
+
+end bench;

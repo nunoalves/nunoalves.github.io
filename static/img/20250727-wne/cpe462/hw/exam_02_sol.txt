@@ -1,0 +1,115 @@
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+ENTITY timerCircuit IS
+PORT (clk_2hz, start_stop,reset : IN STD_LOGIC;
+	min, sec1, sec2 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)); 
+END timerCircuit;
+
+architecture myarch of timerCircuit is
+signal clk_1hz : std_logic := '0';
+signal seconds: integer range 0 to 59 := 0;
+signal minutes : integer range 0 to 9  := 0;
+begin
+	
+	-- generate the slow clock (clk_1hz)
+	process (clk_2hz)
+	begin
+		if (clk_2hz'event and clk_2hz='1') then clk_1hz <= not (clk_1hz); end if;
+	end	process;
+		
+	-- was the reset,start or stop button pressed?
+	process (clk_1hz)
+		variable circuit_running : boolean;
+		variable sec_counter : integer;
+		variable sec_digit01 : integer;
+		variable sec_digit02 : integer;
+		variable min_counter : integer;
+	begin 
+		if (clk_1hz'event and clk_1hz='1') then 
+		
+			if (reset='1') then 
+				sec_counter:=0;
+				min_counter:=0;
+				sec_digit01:=0;
+				sec_digit02:=0;				
+				circuit_running:=false;
+				--seconds<=sec_counter;
+				--minutes<=min_counter;
+			end if;
+						
+			if (start_stop='1') then
+				if (circuit_running=true) then circuit_running:=false;
+					else  circuit_running:=true; end if;
+			end if;
+			
+		    if (circuit_running=true) then 
+				circuit_running:=true;
+				sec_counter:=sec_counter+1;
+				sec_digit01 := sec_digit01 + 1;
+				
+				if (sec_counter mod 10=0)then
+					sec_digit01 := 0;
+					sec_digit02 := sec_digit02 + 1;
+				end if;
+				
+				if (sec_counter=60) then 
+					min_counter:=min_counter+1;
+					sec_counter:=0;
+					sec_digit01:=0;
+					sec_digit02:=0;
+				end if;
+				
+				if (min_counter=10) then
+					min_counter := 0;
+				end if;
+				
+			end if;  	
+
+			-- update SSD digits
+			case min_counter is
+				when 0 => min  <= "1111110";
+				when 1 => min  <= "0110000";
+				when 2 => min  <= "1101101";
+				when 3 => min  <= "1111001";
+				when 4 => min  <= "0110011";			
+				when 5 => min  <= "1011011";
+				when 6 => min  <= "1011111";
+				when 7 => min  <= "1110000";
+				when 8 => min  <= "1111111";
+				when 9 => min  <= "1111011";
+				when others => null;
+			end case;
+
+			case sec_digit01 is
+				when 0 => sec2  <= "1111110";
+				when 1 => sec2  <= "0110000";
+				when 2 => sec2  <= "1101101";
+				when 3 => sec2  <= "1111001";
+				when 4 => sec2  <= "0110011";			
+				when 5 => sec2  <= "1011011";
+				when 6 => sec2  <= "1011111";
+				when 7 => sec2  <= "1110000";
+				when 8 => sec2  <= "1111111";
+				when 9 => sec2  <= "1111011";
+				when others => null;
+			end case;
+	
+			case sec_digit02 is
+				when 0 => sec1  <= "1111110";
+				when 1 => sec1  <= "0110000";
+				when 2 => sec1  <= "1101101";
+				when 3 => sec1  <= "1111001";
+				when 4 => sec1  <= "0110011";			
+				when 5 => sec1  <= "1011011";
+				when 6 => sec1  <= "1011111";
+				when 7 => sec1  <= "1110000";
+				when 8 => sec1  <= "1111111";
+				when 9 => sec1  <= "1111011";
+				when others => null;
+			end case;
+			end if;
+	 end process; 	
+	
+end architecture;
