@@ -50,7 +50,7 @@ sudo apt install -y qemu-system-x86 qemu-utils
 Confirm the version (e.g. 8.2.2):
 
 ```bash
-qemu-system-x86_64 --version
+qemu-system-i386 --version
 ```
 
 ![QEMU version test screenshot](/img/20250611-freedos/qemutest.png)
@@ -71,7 +71,7 @@ qemu-img create -f raw ~/freedos16.img 1536M
 ## 4. Boot the Live-CD and Partition
 
 ```bash
-qemu-system-x86_64 \
+qemu-system-i386 \
   -enable-kvm \
   -m 512 \
   -drive file=~/freedos16.img,if=ide,format=raw,media=disk \
@@ -149,7 +149,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Build QEMU command
-QEMU_CMD=( qemu-system-x86_64
+QEMU_CMD=( qemu-system-i386
   -enable-kvm
   -m 512
   -drive file="$HOME/freedos16.img",if=ide,format=raw,media=disk
@@ -162,6 +162,7 @@ QEMU_CMD=( qemu-system-x86_64
   -net user
   -display gtk
   -full-screen
+  -global i8042.kbd-throttle=on # Add tiny delay to avoid double-pressing keys 
 )
 
 # Pin to CPU core 3 for stability
@@ -172,8 +173,9 @@ This script:
 * Pins the VM to CPU 3 (`taskset`)
 * Adds Sound Blaster and AdLib support for DOS audio
 * Enables NE2000 networking so you can use FreeDOS NET tools
-* Makes sure the mouse works without being laggy.
+* Makes sure the mouse works without being laggy
 * Launches in a fullscreen GTK window
+* Ensures that DOS programs (especially very old games that have their own IRQ handling routines), do not count each keypress twice
 
 Dont forget to make the script executable:
 ```bash

@@ -2,45 +2,59 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on ohNoNuNo</title>
-    <link>http://localhost:1313/tags/</link>
+    <link>http://www.nunoalves.com/tags/</link>
     <description>Recent content in Tags on ohNoNuNo</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 11 Jun 2025 08:02:19 -0400</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Jul 2025 10:32:17 -0400</lastBuildDate>
+    <atom:link href="http://www.nunoalves.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Embedded Systems</title>
+      <link>http://www.nunoalves.com/tags/embedded-systems/</link>
+      <pubDate>Sun, 27 Jul 2025 10:32:17 -0400</pubDate>
+      <guid>http://www.nunoalves.com/tags/embedded-systems/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>VHDL</title>
+      <link>http://www.nunoalves.com/tags/vhdl/</link>
+      <pubDate>Sun, 27 Jul 2025 10:32:17 -0400</pubDate>
+      <guid>http://www.nunoalves.com/tags/vhdl/</guid>
+      <description></description>
+    </item>
     <item>
       <title>DOS</title>
-      <link>http://localhost:1313/tags/dos/</link>
-      <pubDate>Wed, 11 Jun 2025 08:02:19 -0400</pubDate>
-      <guid>http://localhost:1313/tags/dos/</guid>
+      <link>http://www.nunoalves.com/tags/dos/</link>
+      <pubDate>Wed, 11 Jun 2025 08:55:22 -0400</pubDate>
+      <guid>http://www.nunoalves.com/tags/dos/</guid>
       <description></description>
     </item>
     <item>
       <title>Retro Gaming</title>
-      <link>http://localhost:1313/tags/retro-gaming/</link>
+      <link>http://www.nunoalves.com/tags/retro-gaming/</link>
       <pubDate>Wed, 21 May 2025 23:02:19 -0400</pubDate>
-      <guid>http://localhost:1313/tags/retro-gaming/</guid>
+      <guid>http://www.nunoalves.com/tags/retro-gaming/</guid>
       <description></description>
     </item>
     <item>
       <title>Reverse Engineering</title>
-      <link>http://localhost:1313/tags/reverse-engineering/</link>
+      <link>http://www.nunoalves.com/tags/reverse-engineering/</link>
       <pubDate>Wed, 21 May 2025 23:02:19 -0400</pubDate>
-      <guid>http://localhost:1313/tags/reverse-engineering/</guid>
+      <guid>http://www.nunoalves.com/tags/reverse-engineering/</guid>
       <description></description>
     </item>
     <item>
       <title>AI</title>
-      <link>http://localhost:1313/tags/ai/</link>
+      <link>http://www.nunoalves.com/tags/ai/</link>
       <pubDate>Fri, 09 May 2025 21:51:55 -0400</pubDate>
-      <guid>http://localhost:1313/tags/ai/</guid>
+      <guid>http://www.nunoalves.com/tags/ai/</guid>
       <description></description>
     </item>
     <item>
       <title>ZX Spectrum</title>
-      <link>http://localhost:1313/tags/zx-spectrum/</link>
+      <link>http://www.nunoalves.com/tags/zx-spectrum/</link>
       <pubDate>Fri, 09 May 2025 21:51:55 -0400</pubDate>
-      <guid>http://localhost:1313/tags/zx-spectrum/</guid>
+      <guid>http://www.nunoalves.com/tags/zx-spectrum/</guid>
       <description></description>
     </item>
   </channel>

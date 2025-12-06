@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Embedded Systems on ohNoNuNo</title>
-    <link>http://localhost:1313/tags/embedded-systems/</link>
+    <link>http://www.nunoalves.com/tags/embedded-systems/</link>
     <description>Recent content in Embedded Systems on ohNoNuNo</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 27 Jul 2025 10:32:17 -0400</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/embedded-systems/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://www.nunoalves.com/tags/embedded-systems/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Computer Architecture Classes @ WNE</title>
-      <link>http://localhost:1313/posts/wne_classes/</link>
+      <link>http://www.nunoalves.com/posts/wne_classes/</link>
       <pubDate>Sun, 27 Jul 2025 10:32:17 -0400</pubDate>
-      <guid>http://localhost:1313/posts/wne_classes/</guid>
-      <description>&lt;p&gt;+++&#xA;thumbnail = &amp;ldquo;img/20250521-pm2_gnd/mainoff2.gnd.bmp&amp;rdquo;&#xA;+++&lt;/p&gt;</description>
+      <guid>http://www.nunoalves.com/posts/wne_classes/</guid>
+      <description>&lt;p&gt;Many, many, many years ago, I took a small career detour and taught for one year at a regional college in MA. There, I was assigned to teach several introductory computer engineering courses. On this page, I’m sharing the slides from the most memorable ones: real-time kernels (a fancy term for embedded RTOS), VHDL simulation and synthesis, and an electronics summer camp for 8–12-year-olds. The other classes were more prosaic. In a fun twist, almost 15 years later I’m once again working with VHDL. Since my slides were all tucked away on a hard-disk drive, I figured—why not take this opportunity to put everything online for posterity? Enjoy!&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
